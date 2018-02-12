@@ -11,7 +11,7 @@
 ]]--
 
 
- local scriptVersion = '2.3.08'
+ local scriptVersion = '2.3.09'
  local originalVersionUrl = 'https://www.domoticz.com/forum/viewtopic.php?f=34&t=11421'
  local originalAuthor = 'Maes'
  
@@ -26,7 +26,7 @@
      local ScenesSleepLevel             = 20 -- Level of selector defined in ToonScenesSensorName for status Sleep
      local ScenesAwayLevel              = 10 -- Level of selector defined in ToonScenesSensorName for status Away
      local ScenesVacationLevel          = 60 -- Level of selector defined in ToonScenesSensorName for status Vacation
- local ToonAutoProgramSensorName        = 'Toon Auto Programma' -- Dummy Selector Device (it shows or changes the current auto program status)
+ local ToonAutoProgramSensorName        = 'Toon Auto Programma' -- Dummy Selector Device (it shows or changes the current auto program status) (Off state disabled (level 0))
      local AutoProgramNoLevel           = 10 -- Level of selector defined in ToonAutoProgramSensorName for status Auto Program Disabled
      local AutoProgramYesLevel          = 20 -- Level of selector defined in ToonAutoProgramSensorName for status Auto Program Enabled
      local AutoProgramTempLevel         = 30 -- Level of selector defined in ToonAutoProgramSensorName for status Auto Program Temporary Override
