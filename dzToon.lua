@@ -1,11 +1,21 @@
+--[[
+	Prerequisits
+	==================================
+	Domoticz v3.8837 or later (dzVents version 2.4 or later)
+	User Variable named UV_ToonIP type string, that holds the internal Toon IP
+    Dummy switches that match the variables beneath
+
+	CHANGE LOG: See https://github.com/Geo-Ron/dzVents/commits/master/dzToon.lua
+
+
+]]--
+
+
  local scriptVersion = '2.1.12'
  local originalVersionUrl = 'https://www.domoticz.com/forum/viewtopic.php?f=34&t=11421'
  local originalAuthor = 'Maes'
  
-
- 
-
-
+---- Variables to match dummy switches withing Domoticz
  local ToonThermostatSensorName         = 'Toon Thermostaat' -- Sensor showing current setpoint
  local ToonTemperatureSensorName        = 'Toon Temperatuur' -- Sensor showing current room temperature
  local ToonScenesSensorName             = 'Toon Scenes' -- Sensor showing current program
@@ -22,13 +32,14 @@
  local ToonProgramInformationSensorName = 'Toon Program Informatie' -- Sensor showing displaying program information status
  local ToonboilerInTempName             = 'BoilerInletTemp' -- Sensor inlet temperature
  local ToonboilerOutTempName            = 'BoilerOutletTemp' -- Sensor outlet temperature
- local ToonboilerPressure               =   'BoilerPressure' -- ToonboilerPressure
- local ToonModulation                   =   'Toon Modulatie' -- ToonboilerPressure
+ local ToonboilerPressure               = 'BoilerPressure' -- ToonboilerPressure
+ local ToonModulation                   = 'Toon Modulatie' -- ToonboilerPressure
  local ToonBurnerName                   = 'Toon BranderInfo'
     local ToonBurnerOffLevel            = 0 --Burner state off
     local ToonBurnerCVLevel             = 10 --Burner state Central Heating
     local ToonBurnerHotWaterLevel       = 20 --Burner state Hot Water Tap
     local ToonBurnerPreHeatLevel        = 30 --Burner state heating to reach level of program
+----- End Variables
     
  --local DomoticzIP = domoticz.variables('UV_DomoticzIP').value
  
