@@ -11,12 +11,12 @@
 ]]--
 
 
- local scriptVersion = '2.2.07'
+ local scriptVersion = '2.3.08'
  local originalVersionUrl = 'https://www.domoticz.com/forum/viewtopic.php?f=34&t=11421'
  local originalAuthor = 'Maes'
  
 ---- Variables to match dummy switches withing Domoticz
- local ToonIPUserVariable               = 'UV_ToonIP' -- User Variable type String that holds the local IP of Toon
+ local ToonIPUserVariableName           = 'UV_ToonIP' -- User Variable type String that holds the local IP of Toon
  local ToonThermostatSensorName         = 'Toon Thermostaat' -- Dummy Thermostate Setpoint Device (display and change Toon temperature setting)
  local ToonTemperatureSensorName        = 'Toon Temperatuur' -- Dummy Temperature Device (it shows the room temperature)
  local ToonScenesSensorName             = 'Toon Scenes' -- Dummy Selector Device (it shows or changes the Toon Scenes)
@@ -30,12 +30,12 @@
      local AutoProgramNoLevel           = 10 -- Level of selector defined in ToonAutoProgramSensorName for status Auto Program Disabled
      local AutoProgramYesLevel          = 20 -- Level of selector defined in ToonAutoProgramSensorName for status Auto Program Enabled
      local AutoProgramTempLevel         = 30 -- Level of selector defined in ToonAutoProgramSensorName for status Auto Program Temporary Override
- local ToonProgramInformationSensorName = 'Toon Program Informatie' -- Dummy text device (it shows the text program display of Toon)
- local ToonboilerInTempName             = 'BoilerInletTemp' -- Dummy Temperature Device (it shows the boiler inlet temperature)
- local ToonboilerOutTempName            = 'BoilerOutletTemp' -- Dummy Temperature Device (it shows the boilter outlet temperature)
- local ToonboilerPressure               = 'BoilerPressure' -- Dummy Pressure Device (it shows the boiler water pressure)
- local ToonModulationName               = 'Toon Modulatie' -- Dummy Percentage Device (it shows the level of Boiler Modulation)
- local ToonBurnerName                   = 'Toon BranderInfo' -- Dummy Selector Device (it shows the current burner state)  
+ local ToonProgramInformationSensorName = 'Toon Program Informatie' -- (Optional) Dummy text device (it shows the text program display of Toon)
+ local ToonboilerInTempName             = '' -- (Optional) Dummy Temperature Device (it shows the boiler inlet temperature)
+ local ToonboilerOutTempName            = 'BoilerOutletTemp' -- (Optional) Dummy Temperature Device (it shows the boilter outlet temperature)
+ local ToonboilerPressureName           = 'BoilerPressure' -- (Optional) Dummy Pressure Device (it shows the boiler water pressure)
+ local ToonModulationName               = 'Toon Modulatie' -- (Optional) Dummy Percentage Device (it shows the level of Boiler Modulation)
+ local ToonBurnerName                   = 'Toon BranderInfo' -- (Optional) Dummy Selector Device (it shows the current burner state)  
     local ToonBurnerOffLevel            = 0 -- Level of selector defined in ToonBurnerName for status Burner state off
     local ToonBurnerCVLevel             = 10 --Level of selector defined in ToonBurnerName for status Burner state Central Heating
     local ToonBurnerHotWaterLevel       = 20 --Level of selector defined in ToonBurnerName for status Burner state Hot Water Tap
@@ -59,7 +59,7 @@
 	},
 	execute = function(domoticz, item)
 
-    local ToonIP = domoticz.variables(ToonIPUserVariable).value
+    local ToonIP = domoticz.variables(ToonIPUserVariableName).value
 
         if (item.isDevice) then
             -- Run Only if a device has changed on the Domoticz side...
@@ -222,37 +222,49 @@
                 ToonProgramInformationSensorValue = 'Om ' ..os.date('%H:%M', currentNextTime).. ' op ' ..currentNextSetPoint.. '°'
             end
             -- Update Toon Program Information
-            if domoticz.devices(ToonProgramInformationSensorName).text ~= ToonProgramInformationSensorValue then
-                domoticz.log('Updating Toon Program Information to: '..ToonProgramInformationSensorValue)
-                domoticz.devices(ToonProgramInformationSensorName).updateText(ToonProgramInformationSensorValue)
+            if ToonProgramInformationSensorName ~= '' then
+                if domoticz.devices(ToonProgramInformationSensorName).text ~= ToonProgramInformationSensorValue then
+                    domoticz.log('Updating Toon Program Information to: '..ToonProgramInformationSensorValue)
+                    domoticz.devices(ToonProgramInformationSensorName).updateText(ToonProgramInformationSensorValue)
+                end
             end
             -- Update toon burner selector if it has changed
-            if domoticz.devices(ToonBurnerName).level ~= currentBurnerInfo then 
-                domoticz.log('Updating Toon burner info to new level '..currentBurnerInfo)
-                domoticz.devices(ToonBurnerName).switchSelector(currentBurnerInfo).silent()
+            if ToonBurnerName ~= '' then
+                if domoticz.devices(ToonBurnerName).level ~= currentBurnerInfo then 
+                    domoticz.log('Updating Toon burner info to new level '..currentBurnerInfo)
+                    domoticz.devices(ToonBurnerName).switchSelector(currentBurnerInfo).silent()
+                end
             end
             -- Update ModulationInfo
-            if domoticz.devices(ToonModulationName).percentage ~= currentModulation then  
-                domoticz.log('Updating modulation info to new value: '..currentModulation..'%')
-                domoticz.devices(ToonModulationName).updatePercentage(currentModulation).silent()
+            if ToonModulationName ~= '' then
+                if domoticz.devices(ToonModulationName).percentage ~= currentModulation then  
+                    domoticz.log('Updating modulation info to new value: '..currentModulation..'%')
+                    domoticz.devices(ToonModulationName).updatePercentage(currentModulation).silent()
+                end
             end
             -- Update the boilerInTemp
-            domoticz.log('boiler inlet temp: ' ..currentboilerInTemp, domoticz.LOG_DEBUG)
-            if domoticz.devices(ToonboilerInTempName).temperature ~= currentboilerInTemp then  
-                domoticz.log('Updating boiler inlet temp to new value: ' ..currentboilerInTemp, domoticz.LOG_INFO)
-                domoticz.devices(ToonboilerInTempName).updateTemperature(currentboilerInTemp)
+            if ToonboilerInTempName ~= '' then
+                domoticz.log('boiler inlet temp: ' ..currentboilerInTemp, domoticz.LOG_DEBUG)
+                if domoticz.devices(ToonboilerInTempName).temperature ~= currentboilerInTemp then  
+                    domoticz.log('Updating boiler inlet temp to new value: ' ..currentboilerInTemp, domoticz.LOG_INFO)
+                    domoticz.devices(ToonboilerInTempName).updateTemperature(currentboilerInTemp)
+                end
             end
             -- Update the boilerOutTemp
-            domoticz.log('boiler outlet temp: ' ..currentboilerOutTemp, domoticz.LOG_DEBUG)
-            if domoticz.devices(ToonboilerOutTempName).temperature ~= currentboilerOutTemp then 
-                 domoticz.log('Updating boiler outlet temp to new value: ' ..currentboilerOutTemp, domoticz.LOG_INFO)
-                 domoticz.devices(ToonboilerOutTempName).updateTemperature(currentboilerOutTemp)
+            if ToonboilerOutTempName ~= '' then
+                domoticz.log('boiler outlet temp: ' ..currentboilerOutTemp, domoticz.LOG_DEBUG)
+                if domoticz.devices(ToonboilerOutTempName).temperature ~= currentboilerOutTemp then 
+                     domoticz.log('Updating boiler outlet temp to new value: ' ..currentboilerOutTemp, domoticz.LOG_INFO)
+                     domoticz.devices(ToonboilerOutTempName).updateTemperature(currentboilerOutTemp)
+                end
             end
             -- Update the boilerPressure
-            domoticz.log('boiler pressure: ' ..currentboilerPressure, domoticz.LOG_DEBUG)
-            if domoticz.devices(ToonboilerPressure).pressure ~= currentboilerPressure then 
-                domoticz.log('Updating boiler pressure to new value: ' ..currentboilerPressure, domoticz.LOG_INFO)
-                domoticz.devices(ToonboilerPressure).updatePressure(currentboilerPressure)
+            if ToonboilerPressureName ~= '' then
+                domoticz.log('boiler pressure: ' ..currentboilerPressure, domoticz.LOG_DEBUG)
+                if domoticz.devices(ToonboilerPressureName).pressure ~= currentboilerPressure then 
+                    domoticz.log('Updating boiler pressure to new value: ' ..currentboilerPressure, domoticz.LOG_INFO)
+                    domoticz.devices(ToonboilerPressureName).updatePressure(currentboilerPressure)
+                end
             end
         end
             
