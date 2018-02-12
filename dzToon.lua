@@ -11,7 +11,7 @@
 ]]--
 
 
- local scriptVersion = '2.2.03'
+ local scriptVersion = '2.2.05'
  local originalVersionUrl = 'https://www.domoticz.com/forum/viewtopic.php?f=34&t=11421'
  local originalAuthor = 'Maes'
  
@@ -46,7 +46,7 @@
  
  return {
 	logging = {
-		level = domoticz.LOG_DEBUG, -- Uncomment to override the dzVents global logging setting
+		--level = domoticz.LOG_DEBUG, -- Uncomment to override the dzVents global logging setting
 		marker = 'dzToonThermostat v'..scriptVersion
 	},
 	on = {
@@ -71,9 +71,10 @@
 		    --domoticz.openURL(string.format('http://%s/happ_thermstat?action=setSetpoint&Setpoint=%s', ToonIP, device.SetPoint*100))
 		    --item.dump()
 		    if item.name == ToonThermostatSensorName then
-    		    domoticz.log('Try to set setpoint to '.. item.setPoint, domoticz.LOG_DEBUG)
-    			domoticz.openURL('http://'.. ToonIP ..'/happ_thermstat?action=setSetpoint&Setpoint='..item.setPoint*100)
-    			domoticz.log('Updating Toon thermostat sensor (from Domoticz to Toon) to new set point: '.. item.setPoint)
+		        local NewToonSetPoint = domoticz.utils.round(item.setPoint, 2)
+    		    domoticz.log('Try to set Toon setpoint to '.. NewToonSetPoint*100, domoticz.LOG_DEBUG)
+    			domoticz.openURL('http://'.. ToonIP ..'/happ_thermstat?action=setSetpoint&Setpoint='..NewToonSetPoint*100)
+    			domoticz.log('Updating Toon thermostat sensor (from Domoticz to Toon) to new set point: '.. NewToonSetPoint*100)
     		elseif item.name == ToonScenesSensorName then 
     		    domoticz.log('Updating Toon Scene setting based on  '.. item.name, domoticz.LOG_DEBUG)
 		        if item.level == 0 then 
@@ -158,7 +159,7 @@
                 elseif currentBurnerInfo == 3 then currentBurnerInfo = ToonBurnerPreHeatLevel -- warmwater aan
                 else domoticz.log('Device '.. ToonBurnerName ..'changed to unknown value '..tostring(currentBurnerInfo), domoticz.LOG_ERROR)
                 end
-            local currentSetpoint = tonumber(jsonThermostatInfo.currentSetpoint) / 100
+            local currentSetpoint = domoticz.utils.round(tonumber(jsonThermostatInfo.currentSetpoint) / 100, 2)
             local currentTemperature = domoticz.utils.round(tonumber(jsonThermostatInfo.currentTemp) / 100, 1)
             local currentProgramState = tonumber(jsonThermostatInfo.programState)
                 -- Translate the toon program atate to selector for current program state
@@ -196,7 +197,7 @@
             ----
             -- Start changing selectors if needed.
             -- Update the thermostat sensor to current setpoint
-            if domoticz.devices(ToonThermostatSensorName).setPoint ~= currentSetpoint then
+            if domoticz.utils.round(domoticz.devices(ToonThermostatSensorName).setPoint, 2) ~= currentSetpoint then
                 domoticz.log('Updating Domoticz thermostat sensor (from Toon to Domoticz) to new set point: ' ..currentSetpoint)
                 domoticz.devices(ToonThermostatSensorName).updateSetPoint(currentSetpoint).silent()
             end
