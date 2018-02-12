@@ -1,4 +1,4 @@
- local scriptVersion = '2.1.07'
+ local scriptVersion = '2.1.12'
  local originalVersionUrl = 'https://www.domoticz.com/forum/viewtopic.php?f=34&t=11421'
  local originalAuthor = 'Maes'
  
@@ -25,6 +25,7 @@
  local ToonboilerPressure               =   'BoilerPressure' -- ToonboilerPressure
  local ToonModulation                   =   'Toon Modulatie' -- ToonboilerPressure
  local ToonBurnerName                   = 'Toon BranderInfo'
+    local ToonBurnerOffLevel            = 0 --Burner state off
     local ToonBurnerCVLevel             = 10 --Burner state Central Heating
     local ToonBurnerHotWaterLevel       = 20 --Burner state Hot Water Tap
     local ToonBurnerPreHeatLevel        = 30 --Burner state heating to reach level of program
@@ -34,7 +35,7 @@
  return {
 	logging = {
 		--level = domoticz.LOG_DEBUG, -- Uncomment to override the dzVents global logging setting
-		marker = 'dzToon Thermostat '..scriptVersion
+		marker = 'dzToonThermostat v'..scriptVersion
 	},
 	on = {
 		timer = {
@@ -76,18 +77,19 @@
             local currentSetpoint = tonumber(jsonThermostatInfo.currentSetpoint) / 100
             local currentTemperature = tonumber(jsonThermostatInfo.currentTemp) / 100
             local currentProgramState = tonumber(jsonThermostatInfo.programState)
-                if currentProgramState == 0 then currentProgramState = 10 -- No
-                    elseif currentProgramState == 1 then currentProgramState = 20 -- Yes
-                    elseif currentProgramState == 2 then currentProgramState = 30 -- Temporary
+                if currentProgramState == 0 then currentProgramState = AutoProgramNoLevel -- No
+                    elseif currentProgramState == 1 then currentProgramState = AutoProgramYesLevel -- Yes
+                    elseif currentProgramState == 2 then currentProgramState = AutoProgramTempLevel -- Temporary
                     else domoticz.log('currentProgramState unknown: state is '.. currentProgramState, domoticz.LOG_ERROR)  
                 end      
+
             local currentActiveState = tonumber(jsonThermostatInfo.activeState)
-                if currentActiveState == -1 then currentActiveState = 50 -- Manual
-                    elseif currentActiveState == 0 then currentActiveState = 40 -- Comfort
-                    elseif currentActiveState == 1 then currentActiveState = 30 -- Home
-                    elseif currentActiveState == 2 then currentActiveState = 20 -- Sleep
-                    elseif currentActiveState == 3 then currentActiveState = 10 -- Away
-                    elseif currentActiveState == 4 then currentActiveState = 60 -- Vacation 
+                if currentActiveState == -1 then currentActiveState = ScenesManualLevel -- Manual
+                    elseif currentActiveState == 0 then currentActiveState = ScenesComfortLevel -- Comfort
+                    elseif currentActiveState == 1 then currentActiveState = ScenesHomeLevel -- Home
+                    elseif currentActiveState == 2 then currentActiveState = ScenesSleepLevel -- Sleep
+                    elseif currentActiveState == 3 then currentActiveState = ScenesAwayLevel -- Away
+                    elseif currentActiveState == 4 then currentActiveState = ScenesVacationLevel -- Vacation 
                     else domoticz.log('currentActiveState unknown: state is '.. currentActiveState, domoticz.LOG_ERROR)
                 end
             local currentNextTime = jsonThermostatInfo.nextTime
@@ -133,25 +135,24 @@
             end
             
             -- Update the toon burner selector to current program state
-            CurrentToonBurnerValue = domoticz.devices(ToonBurnerName).value  
+            CurrentToonBurnerLevel = domoticz.devices(ToonBurnerName).level  
 
-        	if currentBurnerInfo == 0 or currentBurnerInfo == nil then currentBurnerInfo = '0' -- uit
-            elseif currentBurnerInfo == 1 then currentBurnerInfo = '10' -- cv aan
-            elseif currentBurnerInfo == 2 then currentBurnerInfo = '20' -- warmwater aan
-            elseif currentBurnerInfo == 3 then currentBurnerInfo = '30' -- warmwater aan
-            else 
-                --currentBurnerInfo = '40' -- onbekende waarde 
-                domoticz.log('Device '.. ToonBurnerName ..'changed to unknown value '..tostring(currentBurnerInfo), domoticz.LOG_ERROR)
+        	if currentBurnerInfo == 0 or currentBurnerInfo == nil then currentBurnerInfo = ToonBurnerOffLevel -- uit
+            elseif currentBurnerInfo == 1 then currentBurnerInfo = ToonBurnerCVLevel -- cv aan
+            elseif currentBurnerInfo == 2 then currentBurnerInfo = ToonBurnerHotWaterLevel -- warmwater aan
+            elseif currentBurnerInfo == 3 then currentBurnerInfo = ToonBurnerPreHeatLevel -- warmwater aan
+            else domoticz.log('Device '.. ToonBurnerName ..'changed to unknown value '..tostring(currentBurnerInfo), domoticz.LOG_ERROR)
             end
             
-            if CurrentToonBurnerValue ~= currentBurnerInfo then  -- Update toon burner selector if it has changed
+            if CurrentToonBurnerLevel ~= currentBurnerInfo then  -- Update toon burner selector if it has changed
                 domoticz.log('Updating Toon burner info')
                 domoticz.devices(ToonBurnerName).switchSelector(currentBurnerInfo).silent()
             end
 	
             -- Update ModulationInfo
             local CurrentToonModulationValue = domoticz.devices(ToonModulation).percentage 
-            if currentModulationValue ~= currentModulation then  -- Update toon burner selector if it has changed
+            domoticz.log('Device '.. ToonModulation ..' current value '..tostring(CurrentToonModulationValue)..'. Comparing to '..tostring(currentModulation)..' and update if needed', domoticz.LOG_DEBUG)
+            if CurrentToonModulationValue ~= currentModulation then  -- Update toon burner selector if it has changed
                 domoticz.log('Updating Toon Modulation info')
                 domoticz.devices(ToonModulation).updatePercentage(currentModulation).silent()
             end
@@ -189,16 +190,16 @@
             end
             
         elseif (item.isDevice) then
-            domoticz.log('Device '.. item.name ..'changed.', domoticz.LOG_DEBUG)
+            domoticz.log('Device '.. item.name ..' changed.', domoticz.LOG_DEBUG)
             --Run when device Changed
 		    --domoticz.openURL(string.format('http://%s/happ_thermstat?action=setSetpoint&Setpoint=%s', domoticz.variables('UV_ToonIP').value, device.SetPoint*100))
 		    --item.dump()
-		    if item.Name == ToonThermostatSensorName then
+		    if item.name == ToonThermostatSensorName then
     		    domoticz.log('Try to set setpoint to '.. item.setPoint, domoticz.LOG_DEBUG)
     			domoticz.openURL('http://'.. domoticz.variables('UV_ToonIP').value ..'/happ_thermstat?action=setSetpoint&Setpoint='..item.setPoint*100)
     			domoticz.log('Setting Toon setpoint to '.. item.setPoint)
-    		elseif item.Name == ToonScenesSensorName then 
-    		    domoticz.log('Updating Toon based on  '.. item.Name, domoticz.LOG_DEBUG)
+    		elseif item.name == ToonScenesSensorName then 
+    		    domoticz.log('Updating Toon Scene setting based on  '.. item.name, domoticz.LOG_DEBUG)
 
 		        if item.level == 0 then 
 		            domoticz.log('Toon Scene change to off.', domoticz.LOG_INFO)
@@ -220,7 +221,8 @@
                 elseif item.level == ScenesVacationLevel then 
                     domoticz.log('Toon Scene change to Vacation.', domoticz.LOG_INFO)
                 end
-            elseif item.Name == ToonAutoProgramSensorName then 
+            elseif item.name == ToonAutoProgramSensorName then 
+                domoticz.log('Updating Toon Auto Program based on  '.. item.name..' level is '..item.level, domoticz.LOG_DEBUG)
                 if item.level == 0 then
                 elseif item.level == AutoProgramNoLevel then
                     domoticz.openURL('http://'.. domoticz.variables('UV_ToonIP').value ..'/happ_thermstat?action=changeSchemeState&state=0')
