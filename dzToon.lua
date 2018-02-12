@@ -1,5 +1,5 @@
 --[[
-	Prerequisits
+	Prerequisites
 	==================================
 	Domoticz v3.8837 or later (dzVents version 2.4 or later)
 	User Variable named UV_ToonIP type string, that holds the internal Toon IP
@@ -11,7 +11,7 @@
 ]]--
 
 
- local scriptVersion = '2.2.05'
+ local scriptVersion = '2.2.07'
  local originalVersionUrl = 'https://www.domoticz.com/forum/viewtopic.php?f=34&t=11421'
  local originalAuthor = 'Maes'
  
@@ -34,7 +34,7 @@
  local ToonboilerInTempName             = 'BoilerInletTemp' -- Dummy Temperature Device (it shows the boiler inlet temperature)
  local ToonboilerOutTempName            = 'BoilerOutletTemp' -- Dummy Temperature Device (it shows the boilter outlet temperature)
  local ToonboilerPressure               = 'BoilerPressure' -- Dummy Pressure Device (it shows the boiler water pressure)
- local ToonModulation                   = 'Toon Modulatie' -- Dummy Percentage Device (it shows the level of Boiler Modulation)
+ local ToonModulationName               = 'Toon Modulatie' -- Dummy Percentage Device (it shows the level of Boiler Modulation)
  local ToonBurnerName                   = 'Toon BranderInfo' -- Dummy Selector Device (it shows the current burner state)  
     local ToonBurnerOffLevel            = 0 -- Level of selector defined in ToonBurnerName for status Burner state off
     local ToonBurnerCVLevel             = 10 --Level of selector defined in ToonBurnerName for status Burner state Central Heating
@@ -232,9 +232,9 @@
                 domoticz.devices(ToonBurnerName).switchSelector(currentBurnerInfo).silent()
             end
             -- Update ModulationInfo
-            if domoticz.devices(ToonModulation).percentage ~= currentModulation then  
+            if domoticz.devices(ToonModulationName).percentage ~= currentModulation then  
                 domoticz.log('Updating modulation info to new value: '..currentModulation..'%')
-                domoticz.devices(ToonModulation).updatePercentage(currentModulation).silent()
+                domoticz.devices(ToonModulationName).updatePercentage(currentModulation).silent()
             end
             -- Update the boilerInTemp
             domoticz.log('boiler inlet temp: ' ..currentboilerInTemp, domoticz.LOG_DEBUG)
