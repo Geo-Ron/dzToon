@@ -1,4 +1,4 @@
-local scriptVersion                 = '1.0.0'
+local scriptVersion                 = '1.2.4'
 local SwitchGroup          	        = 'Weklampjes'
 local Selector                      = 'Wekkers_Weekend'
 local ModeSelector                  = 'Automation'
@@ -37,6 +37,12 @@ return {
         local OperationMode           = domoticz.devices(ModeSelector).state
         local OperationSecondMode     = domoticz.devices(ModeSelectorSecond).state
         local TimeSelected            = domoticz.devices(Selector).state
+        
+        if (weekend or OperationSecondMode == 'Vakantie Kinderen' or OperationSecondMode == 'Vakantie Kinderen en Aanwezigheid Override') then
+            Uitslapen = true
+        else
+            Uitslapen = false
+        end
 
         -- for debugging only
         domoticz.log('Running Debug.', domoticz.LOG_DEBUG)
@@ -47,19 +53,19 @@ return {
         domoticz.log('Weekend: '..tostring(weekend),domoticz.LOG_DEBUG)
         domoticz.log('Lampjes State: '..domoticz.groups(SwitchGroup).state,domoticz.LOG_DEBUG)
         -- domoticz.log('Lampjes State: '..domoticz.groups(SwitchGroup).dump(),domoticz.LOG_DEBUG)
-        if (domoticz.time.matchesRule('at 6:45') and OperationMode == 'Normaal' and not weekend) then
+        if (domoticz.time.matchesRule('at 6:45') and OperationMode == 'Normaal' and not Uitslapen) then
             --normale operatie, geen weekend
             domoticz.log('Normal operation. Waking everyone.', domoticz.LOG_INFO)
             domoticz.groups(SwitchGroup).switchOn().forMin(Endurance)
-        elseif (domoticz.time.matchesRule('at 7:30') and TimeSelected == '7h30' and OperationMode == 'Normaal' and (weekend or OperationSecondMode == 'Vakantie Kinderen')) then
+        elseif (domoticz.time.matchesRule('at 7:30') and TimeSelected == '7h30' and OperationMode == 'Normaal' and Uitslapen) then
             -- normale operatie, wel weekend en selector op deze tijd
             domoticz.log('Weekend or Vacation. Waking everyone at set time.', domoticz.LOG_INFO)
             domoticz.groups(SwitchGroup).switchOn().forMin(Endurance)
-        elseif (domoticz.time.matchesRule('at 7:45') and TimeSelected == '7h45' and OperationMode == 'Normaal' and (weekend or OperationSecondMode == 'Vakantie Kinderen')) then
+        elseif (domoticz.time.matchesRule('at 7:45') and TimeSelected == '7h45' and OperationMode == 'Normaal' and Uitslapen) then
             -- normale operatie, wel weekend en selector op deze tijd
             domoticz.log('Weekend or Vacation. Waking everyone at set time.', domoticz.LOG_INFO)
             domoticz.groups(SwitchGroup).switchOn().forMin(Endurance)
-        elseif (domoticz.time.matchesRule('at 8:00') and TimeSelected == '8h00' and OperationMode == 'Normaal' and (weekend or OperationSecondMode == 'Vakantie Kinderen')) then
+        elseif (domoticz.time.matchesRule('at 8:00') and TimeSelected == '8h00' and OperationMode == 'Normaal' and Uitslapen) then
             -- normale operatie, wel weekend en selector op deze tijd
             domoticz.log('Weekend or Vacation. Waking everyone at set time.', domoticz.LOG_INFO)
             domoticz.groups(SwitchGroup).switchOn().forMin(Endurance)
