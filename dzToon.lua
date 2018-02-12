@@ -236,10 +236,13 @@
                 domoticz.log('Updating Toon Auto Program based on  '.. item.name..' level is '..item.level, domoticz.LOG_DEBUG)
                 if item.level == 0 then
                 elseif item.level == AutoProgramNoLevel then
+                    domoticz.log('Toon Auto Program change to Disabled.', domoticz.LOG_INFO)
                     domoticz.openURL('http://'.. domoticz.variables('UV_ToonIP').value ..'/happ_thermstat?action=changeSchemeState&state=0')
                 elseif item.level == AutoProgramYesLevel then
+                    domoticz.log('Toon Auto Program change to Enabled.', domoticz.LOG_INFO)
                     domoticz.openURL('http://'.. domoticz.variables('UV_ToonIP').value ..'/happ_thermstat?action=changeSchemeState&state=1')
                 elseif item.level == AutoProgramTempLevel then
+                    domoticz.log('Toon Auto Program change to Temporary, but that has no function from this Point Of View.', domoticz.LOG_INFO)
                 end
                     
             end
