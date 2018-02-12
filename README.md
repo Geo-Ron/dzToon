@@ -1,2 +1,2 @@
-# dzToon
-Domoticz Toon dzVents
+# dzVents
+My Domoticz Scripts
