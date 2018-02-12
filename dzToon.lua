@@ -156,7 +156,7 @@
             end
             
             if CurrentToonBurnerLevel ~= currentBurnerInfo then  -- Update toon burner selector if it has changed
-                domoticz.log('Updating Toon burner info')
+                domoticz.log('Updating Toon burner info to new level '..currentBurnerInfo)
                 domoticz.devices(ToonBurnerName).switchSelector(currentBurnerInfo).silent()
             end
 	
@@ -164,7 +164,7 @@
             local CurrentToonModulationValue = domoticz.devices(ToonModulation).percentage 
             domoticz.log('Device '.. ToonModulation ..' current value '..tostring(CurrentToonModulationValue)..'. Comparing to '..tostring(currentModulation)..' and update if needed', domoticz.LOG_DEBUG)
             if CurrentToonModulationValue ~= currentModulation then  -- Update toon burner selector if it has changed
-                domoticz.log('Updating Toon Modulation info')
+                domoticz.log('Updating modulation info to new value: '..currentModulation..'%')
                 domoticz.devices(ToonModulation).updatePercentage(currentModulation).silent()
             end
             
