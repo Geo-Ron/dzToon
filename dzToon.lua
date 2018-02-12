@@ -11,11 +11,12 @@
 ]]--
 
 
- local scriptVersion = '2.1.12'
+ local scriptVersion = '2.1.38'
  local originalVersionUrl = 'https://www.domoticz.com/forum/viewtopic.php?f=34&t=11421'
  local originalAuthor = 'Maes'
  
 ---- Variables to match dummy switches withing Domoticz
+ local ToonIPUserVariable               = 'UV_ToonIP' -- Specification of user variable that hold the Toon IP
  local ToonThermostatSensorName         = 'Toon Thermostaat' -- Sensor showing current setpoint
  local ToonTemperatureSensorName        = 'Toon Temperatuur' -- Sensor showing current room temperature
  local ToonScenesSensorName             = 'Toon Scenes' -- Sensor showing current program
@@ -61,7 +62,7 @@
 	},
 	execute = function(domoticz, item)
 
-    local ToonIP = domoticz.variables('UV_ToonIP').value
+    local ToonIP = domoticz.variables(ToonIPUserVariable).value
     
         if (item.isTimer) then
             -- Run Every Minute
@@ -203,32 +204,32 @@
         elseif (item.isDevice) then
             domoticz.log('Device '.. item.name ..' changed.', domoticz.LOG_DEBUG)
             --Run when device Changed
-		    --domoticz.openURL(string.format('http://%s/happ_thermstat?action=setSetpoint&Setpoint=%s', domoticz.variables('UV_ToonIP').value, device.SetPoint*100))
+		    --domoticz.openURL(string.format('http://%s/happ_thermstat?action=setSetpoint&Setpoint=%s', ToonIP, device.SetPoint*100))
 		    --item.dump()
 		    if item.name == ToonThermostatSensorName then
     		    domoticz.log('Try to set setpoint to '.. item.setPoint, domoticz.LOG_DEBUG)
-    			domoticz.openURL('http://'.. domoticz.variables('UV_ToonIP').value ..'/happ_thermstat?action=setSetpoint&Setpoint='..item.setPoint*100)
+    			domoticz.openURL('http://'.. ToonIP ..'/happ_thermstat?action=setSetpoint&Setpoint='..item.setPoint*100)
     			domoticz.log('Setting Toon setpoint to '.. item.setPoint)
     		elseif item.name == ToonScenesSensorName then 
     		    domoticz.log('Updating Toon Scene setting based on  '.. item.name, domoticz.LOG_DEBUG)
 
 		        if item.level == 0 then 
 		            domoticz.log('Toon Scene change to off.', domoticz.LOG_INFO)
-		            domoticz.openURL('http://'.. domoticz.variables('UV_ToonIP').value ..'/happ_thermstat?action=setSetpoint&Setpoint=69')
+		            domoticz.openURL('http://'.. ToonIP ..'/happ_thermstat?action=setSetpoint&Setpoint=69')
 		        elseif item.level == ScenesManualLevel then 
 		            domoticz.log('Toon Scene change to manual.', domoticz.LOG_INFO)
     		    elseif item.level == ScenesComfortLevel then 
     		        domoticz.log('Toon Scene change to Comfort.', domoticz.LOG_INFO)
-    		        domoticz.openURL('http://'.. domoticz.variables('UV_ToonIP').value ..'/happ_thermstat?action=changeSchemeState&state=2&temperatureState=0')
+    		        domoticz.openURL('http://'.. ToonIP ..'/happ_thermstat?action=changeSchemeState&state=2&temperatureState=0')
 		        elseif item.level == ScenesHomeLevel then       
 		            domoticz.log('Toon Scene change to Home.', domoticz.LOG_INFO)
-		            domoticz.openURL('http://'.. domoticz.variables('UV_ToonIP').value ..'/happ_thermstat?action=changeSchemeState&state=2&temperatureState=1')
+		            domoticz.openURL('http://'.. ToonIP ..'/happ_thermstat?action=changeSchemeState&state=2&temperatureState=1')
 	            elseif item.level == ScenesSleepLevel then      
 	                domoticz.log('Toon Scene change to Sleep.', domoticz.LOG_INFO)
-	                domoticz.openURL('http://'.. domoticz.variables('UV_ToonIP').value ..'/happ_thermstat?action=changeSchemeState&state=2&temperatureState=2')
+	                domoticz.openURL('http://'.. ToonIP ..'/happ_thermstat?action=changeSchemeState&state=2&temperatureState=2')
                 elseif item.level == ScenesAwayLevel then       
                     domoticz.log('Toon Scene change to Away.', domoticz.LOG_INFO)
-                    domoticz.openURL('http://'.. domoticz.variables('UV_ToonIP').value ..'/happ_thermstat?action=changeSchemeState&state=2&temperatureState=3')
+                    domoticz.openURL('http://'.. ToonIP ..'/happ_thermstat?action=changeSchemeState&state=2&temperatureState=3')
                 elseif item.level == ScenesVacationLevel then 
                     domoticz.log('Toon Scene change to Vacation.', domoticz.LOG_INFO)
                 end
@@ -237,17 +238,17 @@
                 if item.level == 0 then
                 elseif item.level == AutoProgramNoLevel then
                     domoticz.log('Toon Auto Program change to Disabled.', domoticz.LOG_INFO)
-                    domoticz.openURL('http://'.. domoticz.variables('UV_ToonIP').value ..'/happ_thermstat?action=changeSchemeState&state=0')
+                    domoticz.openURL('http://'.. ToonIP ..'/happ_thermstat?action=changeSchemeState&state=0')
                 elseif item.level == AutoProgramYesLevel then
                     domoticz.log('Toon Auto Program change to Enabled.', domoticz.LOG_INFO)
-                    domoticz.openURL('http://'.. domoticz.variables('UV_ToonIP').value ..'/happ_thermstat?action=changeSchemeState&state=1')
+                    domoticz.openURL('http://'.. ToonIP ..'/happ_thermstat?action=changeSchemeState&state=1')
                 elseif item.level == AutoProgramTempLevel then
                     domoticz.log('Toon Auto Program change to Temporary, but that has no function from this Point Of View.', domoticz.LOG_INFO)
                 end
                     
             end
         end
-	end
+  end
 }
  
    
