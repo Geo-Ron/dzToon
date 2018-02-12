@@ -16,33 +16,31 @@
  local originalAuthor = 'Maes'
  
 ---- Variables to match dummy switches withing Domoticz
- local ToonIPUserVariable               = 'UV_ToonIP' -- Specification of user variable that hold the Toon IP
- local ToonThermostatSensorName         = 'Toon Thermostaat' -- Sensor showing current setpoint
- local ToonTemperatureSensorName        = 'Toon Temperatuur' -- Sensor showing current room temperature
- local ToonScenesSensorName             = 'Toon Scenes' -- Sensor showing current program
-     local ScenesManualLevel            = 50 -- Manual
-     local ScenesComfortLevel           = 40 -- Comfort
-     local ScenesHomeLevel              = 30 -- Home
-     local ScenesSleepLevel             = 20 -- Sleep
-     local ScenesAwayLevel              = 10 -- Away
-     local ScenesVacationLevel          = 60 -- Vacation
- local ToonAutoProgramSensorName        = 'Toon Auto Programma' -- Sensor showing current auto program status
-     local AutoProgramNoLevel           = 10 -- Auto Program Disabled
-     local AutoProgramYesLevel          = 20 -- Auto Program Enabled
-     local AutoProgramTempLevel         = 30 -- Auto Program Temporary Override
- local ToonProgramInformationSensorName = 'Toon Program Informatie' -- Sensor showing displaying program information status
- local ToonboilerInTempName             = 'BoilerInletTemp' -- Sensor inlet temperature
- local ToonboilerOutTempName            = 'BoilerOutletTemp' -- Sensor outlet temperature
- local ToonboilerPressure               = 'BoilerPressure' -- ToonboilerPressure
- local ToonModulation                   = 'Toon Modulatie' -- ToonboilerPressure
- local ToonBurnerName                   = 'Toon BranderInfo'
-    local ToonBurnerOffLevel            = 0 --Burner state off
-    local ToonBurnerCVLevel             = 10 --Burner state Central Heating
-    local ToonBurnerHotWaterLevel       = 20 --Burner state Hot Water Tap
-    local ToonBurnerPreHeatLevel        = 30 --Burner state heating to reach level of program
+ local ToonIPUserVariable               = 'UV_ToonIP' -- User Variable type String that holds the local IP of Toon
+ local ToonThermostatSensorName         = 'Toon Thermostaat' -- Dummy Thermostate Setpoint Device (display and change Toon temperature setting)
+ local ToonTemperatureSensorName        = 'Toon Temperatuur' -- Dummy Temperature Device (it shows the room temperature)
+ local ToonScenesSensorName             = 'Toon Scenes' -- Dummy Selector Device (it shows or changes the Toon Scenes)
+     local ScenesManualLevel            = 50 -- Level of selector defined in ToonScenesSensorName for status Manual
+     local ScenesComfortLevel           = 40 -- Level of selector defined in ToonScenesSensorName for status Comfort
+     local ScenesHomeLevel              = 30 -- Level of selector defined in ToonScenesSensorName for status Home
+     local ScenesSleepLevel             = 20 -- Level of selector defined in ToonScenesSensorName for status Sleep
+     local ScenesAwayLevel              = 10 -- Level of selector defined in ToonScenesSensorName for status Away
+     local ScenesVacationLevel          = 60 -- Level of selector defined in ToonScenesSensorName for status Vacation
+ local ToonAutoProgramSensorName        = 'Toon Auto Programma' -- Dummy Selector Device (it shows or changes the current auto program status)
+     local AutoProgramNoLevel           = 10 -- Level of selector defined in ToonAutoProgramSensorName for status Auto Program Disabled
+     local AutoProgramYesLevel          = 20 -- Level of selector defined in ToonAutoProgramSensorName for status Auto Program Enabled
+     local AutoProgramTempLevel         = 30 -- Level of selector defined in ToonAutoProgramSensorName for status Auto Program Temporary Override
+ local ToonProgramInformationSensorName = 'Toon Program Informatie' -- Dummy text device (it shows the text program display of Toon)
+ local ToonboilerInTempName             = 'BoilerInletTemp' -- Dummy Temperature Device (it shows the boiler inlet temperature)
+ local ToonboilerOutTempName            = 'BoilerOutletTemp' -- Dummy Temperature Device (it shows the boilter outlet temperature)
+ local ToonboilerPressure               = 'BoilerPressure' -- Dummy Pressure Device (it shows the boiler water pressure)
+ local ToonModulation                   = 'Toon Modulatie' -- Dummy Percentage Device (it shows the level of Boiler Modulation)
+ local ToonBurnerName                   = 'Toon BranderInfo' -- Dummy Selector Device (it shows the current burner state)  
+    local ToonBurnerOffLevel            = 0 -- Level of selector defined in ToonBurnerName for status Burner state off
+    local ToonBurnerCVLevel             = 10 --Level of selector defined in ToonBurnerName for status Burner state Central Heating
+    local ToonBurnerHotWaterLevel       = 20 --Level of selector defined in ToonBurnerName for status Burner state Hot Water Tap
+    local ToonBurnerPreHeatLevel        = 30 --Level of selector defined in ToonBurnerName for status Burner state heating to reach start level of program
 ----- End Variables
-    
- --local DomoticzIP = domoticz.variables('UV_DomoticzIP').value
  
  return {
 	logging = {
