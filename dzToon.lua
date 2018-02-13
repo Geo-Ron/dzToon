@@ -7,13 +7,18 @@
 
 	CHANGE LOG: See https://github.com/Geo-Ron/dzVents/commits/master/dzToon.lua
 
+	THANKS AND CONFETTI FOR:
+	- MarcelR and many other	for getting a rooted toon			'https://www.domoticaforum.eu/viewtopic.php?f=87&t=11235'
+	- Maes			for the original script and documentation		'https://www.domoticz.com/forum/viewtopic.php?f=34&t=11421'
+	- DennisD		for the Burner Info addition					'https://www.domoticz.com/forum/viewtopic.php?f=34&t=11421&p=161078#p161078'
+	- Emacee		ideas for boiler Pressure						'https://www.domoticaforum.eu/viewtopic.php?f=87&t=11671&start=90'
+	- and the others I seems to keep forgetting
+	
 
 ]]--
 
 
- local scriptVersion = '2.3.09'
- local originalVersionUrl = 'https://www.domoticz.com/forum/viewtopic.php?f=34&t=11421'
- local originalAuthor = 'Maes'
+ local scriptVersion = '2.3.10'
  
 ---- Variables to match dummy switches withing Domoticz
  local ToonIPUserVariableName           = 'UV_ToonIP' -- User Variable type String that holds the local IP of Toon
@@ -72,6 +77,10 @@
 		        local NewToonSetPoint = domoticz.utils.round(item.setPoint, 2)
     		    domoticz.log('Try to set Toon setpoint to '.. NewToonSetPoint*100, domoticz.LOG_DEBUG)
     			domoticz.openURL('http://'.. ToonIP ..'/happ_thermstat?action=setSetpoint&Setpoint='..NewToonSetPoint*100)
+				    -- Optional Rework - need to test
+					--local handle = assert(io.popen(string.format('curl http://%s/happ_thermstat?action=setSetpoint&Setpoint=%s', ToonIP, NewToonSetPoint*100)))
+					--local BoilerInfo = handle:read('*all')
+					--handle:close()
     			domoticz.log('Updating Toon thermostat sensor (from Domoticz to Toon) to new set point: '.. NewToonSetPoint*100)
     		elseif item.name == ToonScenesSensorName then 
     		    domoticz.log('Updating Toon Scene setting based on  '.. item.name, domoticz.LOG_DEBUG)
