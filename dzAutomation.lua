@@ -10,7 +10,7 @@
 	
 ]]--
 
-local scriptVersion                 			= '2.1.46'
+local scriptVersion                 			= '2.1.43'
 local ModeSelector      		       			= 'Automation'
 	local ModeSelectorLevelNormal				= 10
 	local ModeSelectorLevelManual				= 20
@@ -116,7 +116,7 @@ return {
 						local NewSetpoint     = CurrentSetpoint - 2
 						domoticz.log('Changing thermostat program to temporary and temp to '..NewSetpoint..' degrees.', domoticz.LOG_INFO)
 						--domoticz.devices(HeatingAutoProgramSelector).switchSelector(30)
-						domoticz.devices(HeatingSetpoint).updateSetPoint(NewSetpoint).afterMin(30)
+						domoticz.devices(HeatingSetpoint).updateSetPoint(NewSetpoint) --.afterMin(30)
 						
 						--Als normaal de radio aan staat, deze uit zetten
 						time = os.date("*t")
