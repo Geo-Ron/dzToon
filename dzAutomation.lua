@@ -10,7 +10,7 @@
 	
 ]]--
 
-local scriptVersion                 			= '2.1.21'
+local scriptVersion                 			= '2.1.22'
 local ModeSelector      		       			= 'Automation'
 	local ModeSelectorLevelNormal				= 10
 	local ModeSelectorLevelManual				= 20
@@ -147,7 +147,6 @@ return {
 				domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelNormal)
 			end
 		end
-		
-		domoticz.log('Reached the end of the script. Nothing more to do.'), domoticz.LOG_DEBUG)
+		domoticz.log('Reached the end of the script. Nothing more to do.', domoticz.LOG_DEBUG)
 	end
 }
