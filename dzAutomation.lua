@@ -10,7 +10,7 @@
 	
 ]]--
 
-local scriptVersion                 			= '2.2.54'
+local scriptVersion                 			= '2.2.64'
 
 
 -- Start User Defineable Variables
@@ -60,10 +60,8 @@ return {
 		local OperationMode           = domoticz.devices(ModeSelector).level
 		local OperationSecondMode     = domoticz.devices(ModeSelectorSecond).level	
 		
-		
-		domoticz.log('Variable HeatingAutoProgramLevelAuto value '..HeatingAutoProgramLevelAuto, domoticz.LOG_DEBUG)
-
-        if (device.name ~= ModeSelector and domoticz.devices(ModeSelector).level == ModeSelectorLevelManual) then
+        if (device.name ~= ModeSelector)
+		and (domoticz.devices(ModeSelector).level == ModeSelectorLevelManual) then
             domoticz.log('Initiation by device trigger. Changed '..device.name..' level:'..tostring(device.level)..' value: '..tostring(device.value) ..' state: '..tostring(device.state), domoticz.LOG_IFNO)
             domoticz.log(ModeSelector..' changed. Systeem staat op handmatig. Ik doe NIKS!', domoticz.LOG_IFNFO)
             return
@@ -71,13 +69,15 @@ return {
 
 			if (device.isTimer) then	--Start Timer Actions
 				domoticz.log('Initiation by time trigger.', domoticz.LOG_DEBUG)
-				if (domoticz.devices(HeatingScenesSelector).level == HeatingScenesLevelVacation and domoticz.devices(ModeSelector).level ~= ModeSelectorLevelVacation) then
+				if (domoticz.devices(HeatingScenesSelector).level == HeatingScenesLevelVacation)
+				and (domoticz.devices(ModeSelector).level ~= ModeSelectorLevelVacation) then
 					domoticz.log('Verwarming staat op vakantie. Automatisering nog niet. Corrigeren', domoticz.LOG_DEBUG)
 					--Echter pakt dit script NIET de device change op die door het Toon-Timer script gedaan wordt.
 					domoticz.log('Thermostat notified Domoticz of vacation mode.', domoticz.LOG_INFO)
 					domoticz.devices(ModeSelector).switchSelector(ModeSelectorLevelVacation).silent()
 					domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelNormal)
-				elseif (domoticz.devices(HeatingScenesSelector).level ~= HeatingScenesLevelVacation and domoticz.devices(ModeSelector).level == ModeSelectorLevelVacation) then
+				elseif (domoticz.devices(HeatingScenesSelector).level ~= HeatingScenesLevelVacation)
+				and	(domoticz.devices(ModeSelector).level == ModeSelectorLevelVacation) then
 					domoticz.log('Thermostaat staat niet op vakantie. Automatisering wel nog. Corrigeren', domoticz.LOG_DEBUG)
 					--Echter pakt dit script NIET de device change op die door het Toon-Timer script gedaan wordt.
 					domoticz.log('Thermostat notified Domoticz of disabled vacation mode. Changing automation to normal', domoticz.LOG_INFO)
@@ -108,20 +108,22 @@ return {
 				elseif (device.level == ModeSelectorLevelManual) then
 				-- Systeem status handmatig
 					domoticz.log(ModeSelector..' changed. Systeem staat op handmatig. Ik doe NIKS!', domoticz.LOG_DEBUG)
-				elseif (device.level == ModeSelectorLevelVacation and domoticz.devices(HeatingScenesSelector).level ~= HeatingScenesLevelVacation) then
+				elseif (device.level == ModeSelectorLevelVacation)
+				and (domoticz.devices(HeatingScenesSelector).level ~= HeatingScenesLevelVacation) then
 				-- Systeem status Vakantie
 					-- Automation met de hand op vakantie gezet. Dit kan niet. wordt terug gezet naar normaal.
 					domoticz.log('Domoticz set to vacation mode. This is not possible. Needs to be done through thermostat.', domoticz.LOG_ERROR)
-					domoticz.log('Domoticz switch '..device.name..' will be reverted to level '..tostring(device.lastlevel)..'.', domoticz.LOG_ERROR)
-					if (device.lastlevel == nil) then
+					domoticz.log('Domoticz switch '..device.name..' will be reverted to level '..tostring(device.lastLevel)..'.', domoticz.LOG_ERROR)
+					if (device.lastLevel == nil) then
 						device.switchSelector(ModeSelectorLevelNormal)
 					else
-						device.switchSelector(device.lastlevel).silent()
+						device.switchSelector(device.lastLevel).silent()
 					end
 				elseif (device.level == ModeSelectorLevelAway) then
-				domoticz.log(ModeSelector..' changed. Iedereen is weg', domoticz.LOG_DEBUG)
-				-- Systeem status Weg
-					if (OperationSecondMode ~= ModeSelectorSecondLevelPresOverr and OperationSecondMode ~= ModeSelectorSecondLevelKidVacPresOver) then 
+					domoticz.log(ModeSelector..' changed. Iedereen is weg', domoticz.LOG_DEBUG)
+					-- Systeem status Weg
+					if (OperationSecondMode ~= ModeSelectorSecondLevelPresOverr)
+					and (OperationSecondMode ~= ModeSelectorSecondLevelKidVacPresOver) then 
 						domoticz.log('Iedereen is zojuist vertrokken en geen override.', domoticz.LOG_DEBUG)
 						--Verwarming handmatig op twee graden lager zetten
 						local CurrentSetpoint = domoticz.devices(HeatingSetpoint).setPoint
@@ -154,13 +156,15 @@ return {
 
 			elseif (device.name == HeatingScenesSelector) then
 				domoticz.log(HeatingScenesSelector..' changed.', domoticz.LOG_DEBUG)
-				if (device.level == HeatingScenesLevelVacation and domoticz.devices(ModeSelector).level ~= ModeSelectorLevelVacation) then
+				if (device.level == HeatingScenesLevelVacation)
+				and (domoticz.devices(ModeSelector).level ~= ModeSelectorLevelVacation) then
 					domoticz.log(HeatingScenesSelector..' changed. Vacationmode On and '..ModeSelector..' has no Vacationlevel set.', domoticz.LOG_DEBUG)
 				-- Systeem status Vakantie. Wordt opgelegd door Toon
 					domoticz.log('Thermostat notified Domoticz of vacation mode.', domoticz.LOG_INFO)
 					domoticz.devices(ModeSelector).switchSelector(ModeSelectorLevelVacation).silent()
 					domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelNormal)
-				elseif (device.level ~= HeatingScenesLevelVacation and domoticz.devices(ModeSelector).level == ModeSelectorLevelVacation) then
+				elseif (device.level ~= HeatingScenesLevelVacation)
+				and (domoticz.devices(ModeSelector).level == ModeSelectorLevelVacation) then
 					domoticz.log(HeatingScenesSelector..' changed. Vacationmode Off and '..ModeSelector..' has Vacationlevel set.', domoticz.LOG_DEBUG)
 				-- Systeem status WAS Vakantie. Wordt opgelegd door Toon
 					domoticz.log('Thermostat notified Domoticz of disabled vacation mode. Changing automation to normal', domoticz.LOG_INFO)
