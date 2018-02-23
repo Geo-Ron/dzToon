@@ -10,7 +10,7 @@
 	
 ]]--
 
-local scriptVersion                 			= '2.2.67'
+local scriptVersion                 			= '2.3.12'
 
 
 -- Start User Defineable Variables
@@ -37,6 +37,7 @@ local DayTimeDevices 							= {
 													'Radio Keuken'
 												} 	-- Devices that are on during the day
 local WU_Device                                 = 'WU_THB'
+local PresenceOverrideTimeRule					= 'on tue'
 -- End User Defineable Variable
 
 return {
@@ -66,6 +67,26 @@ return {
             domoticz.log(ModeSelector..' changed. Systeem staat op handmatig. Ik doe NIKS!', domoticz.LOG_IFNFO)
             return
         end
+		
+		
+		----------------------------------------------------------
+		-- On tuesdays the presence override needs to be activated
+		if domoticz.time.matchesRule(PresenceOverrideTimeRule) then
+			domoticz.log('PresenceOverrideTimeRule is today. Changing ModeSelectorSecond level if needed', domoticz.LOG_DEBUG)
+			if (domoticz.devices(ModeSelectorSecond).level == ModeSelectorSecondLevelKidVac) then
+				domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelKidVacPresOver).checkFirst()
+			else
+				domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelPresOverr).checkFirst()
+			end
+		-- if not on tuesday 
+		elseif (domoticz.devices(ModeSelectorSecond).level == ModeSelectorSecondLevelPresOverr) then
+			domoticz.log('PresenceOverrideTimeRule is NOT today. Changing ModeSelectorSecond level if needed', domoticz.LOG_DEBUG)
+			domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelNormal).checkFirst()
+		elseif (domoticz.devices(ModeSelectorSecond).level == ModeSelectorSecondLevelKidVacPresOver) then
+			domoticz.log('PresenceOverrideTimeRule is NOT today and it was a childrens holiday. Changing ModeSelectorSecond level if needed', domoticz.LOG_DEBUG)
+			domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelKidVac).checkFirst()
+		end	
+		
 
 			if (device.isTimer) then	--Start Timer Actions
 				domoticz.log('Initiation by time trigger.', domoticz.LOG_DEBUG)
