@@ -10,7 +10,7 @@
 	
 ]]--
 
-local scriptVersion                 			= '2.3.14'
+local scriptVersion                 			= '2.3.15'
 
 
 -- Start User Defineable Variables
@@ -52,7 +52,7 @@ return {
             },
 		devices = {
 			ModeSelector,
-			HeatingScenesSelector,
+			--HeatingScenesSelector,    --dzToon script update vanuit Toon -> Domoticz gaat met .silent()
 			PresenceDetectionSwitch
 		}
 	},
