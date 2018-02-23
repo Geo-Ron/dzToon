@@ -10,7 +10,7 @@
 	
 ]]--
 
-local scriptVersion                 			= '2.1.39'
+local scriptVersion                 			= '2.1.46'
 local ModeSelector      		       			= 'Automation'
 	local ModeSelectorLevelNormal				= 10
 	local ModeSelectorLevelManual				= 20
@@ -88,7 +88,7 @@ return {
 							local DayDevices = domoticz.devices().filter(DayTimeDevices)
 							DayDevices.forEach(function(DayDevice)
 								domoticz.log('Switching Daily device '..DayDevice.name..' on.', domoticz.LOG_DEBUG)
-								DayDevice.switchOn().CheckFirst()
+								DayDevice.switchOn() --.CheckFirst()
 							end)
 					end
 				
@@ -111,7 +111,8 @@ return {
 					if (OperationSecondMode ~= ModeSelectorSecondLevelPresOverr and OperationSecondMode ~= ModeSelectorSecondLevelKidVacPresOver) then 
 						domoticz.log('Iedereen is zojuist vertrokken en geen override.', domoticz.LOG_DEBUG)
 						--Verwarming handmatig op twee graden lager zetten
-						local CurrentSetpoint = domoticz.devices(HeatingSetpoint).setpoint
+						local CurrentSetpoint = domoticz.devices(HeatingSetpoint).setPoint
+						domoticz.log('Fetched setpoint from '..HeatingSetpoint..' with value: '..CurrentSetpoint..' degrees.', domoticz.LOG_DEBUG)
 						local NewSetpoint     = CurrentSetpoint - 2
 						domoticz.log('Changing thermostat program to temporary and temp to '..NewSetpoint..' degrees.', domoticz.LOG_INFO)
 						--domoticz.devices(HeatingAutoProgramSelector).switchSelector(30)
@@ -124,7 +125,7 @@ return {
 							local DayDevices = domoticz.devices().filter(DayTimeDevices)
 							DayDevices.forEach(function(DayDevice)
 								domoticz.log('Switching Daily device '..DayDevice.name..' off.', domoticz.LOG_DEBUG)
-								DayDevice.switchOff().CheckFirst()
+								DayDevice.switchOff() --.CheckFirst()
 							end)
 						end	
 					else
