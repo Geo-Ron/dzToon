@@ -10,7 +10,7 @@
 	
 ]]--
 
-local scriptVersion                 			= '2.1.22'
+local scriptVersion                 			= '2.1.38'
 local ModeSelector      		       			= 'Automation'
 	local ModeSelectorLevelNormal				= 10
 	local ModeSelectorLevelManual				= 20
@@ -35,7 +35,7 @@ local DayTimeDevices 							= {
 
 return {
 	logging = {
-		--level = domoticz.LOG_DEBUG, -- Uncomment to override the dzVents global logging setting
+		level = domoticz.LOG_DEBUG, -- Uncomment to override the dzVents global logging setting
 		marker = 'Automation '..scriptVersion
 	},
 	on = {
@@ -54,99 +54,100 @@ return {
 		local OperationMode           = domoticz.devices(ModeSelector).level
 		local OperationSecondMode     = domoticz.devices(ModeSelectorSecond).level	
 		
+		domoticz.log('Variable HeatingAutoProgramLevelAuto value '..HeatingAutoProgramLevelAuto, domoticz.LOG_DEBUG)
 		
-		if (device.isTimer) then	--Start Timer Actions
-			domoticz.log('Initiation by time trigger.', domoticz.LOG_DEBUG)
-			if (domoticz.devices(HeatingScenesSelector).level == HeatingScenesLevelVacation and domoticz.devices(ModeSelector).level ~= ModeSelectorLevelVacation) then
-				domoticz.log('Verwarming staat op vakantie. Automatisering nog niet. Corrigeren', domoticz.LOG_DEBUG)
-				--Echter pakt dit script NIET de device change op die door het Toon-Timer script gedaan wordt.
-				domoticz.log('Thermostat notified Domoticz of vacation mode.', domoticz.LOG_INFO)
-				domoticz.devices(ModeSelector).switchSelector(ModeSelectorLevelVacation).silent()
-				domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelNormal)
-			elseif (domoticz.devices(HeatingScenesSelector).level ~= HeatingScenesLevelVacation and domoticz.devices(ModeSelector).level == ModeSelectorLevelVacation) then
-				domoticz.log('Thermostaat staat niet op vakantie. Automatisering wel nog. Corrigeren', domoticz.LOG_DEBUG)
-				--Echter pakt dit script NIET de device change op die door het Toon-Timer script gedaan wordt.
-				domoticz.log('Thermostat notified Domoticz of disabled vacation mode. Changing automation to normal', domoticz.LOG_INFO)
-				domoticz.devices(ModeSelector).switchSelector(ModeSelectorLevelNormal)
-				domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelNormal)
+			if (device.isTimer) then	--Start Timer Actions
+				domoticz.log('Initiation by time trigger.', domoticz.LOG_DEBUG)
+				if (domoticz.devices(HeatingScenesSelector).level == HeatingScenesLevelVacation and domoticz.devices(ModeSelector).level ~= ModeSelectorLevelVacation) then
+					domoticz.log('Verwarming staat op vakantie. Automatisering nog niet. Corrigeren', domoticz.LOG_DEBUG)
+					--Echter pakt dit script NIET de device change op die door het Toon-Timer script gedaan wordt.
+					domoticz.log('Thermostat notified Domoticz of vacation mode.', domoticz.LOG_INFO)
+					domoticz.devices(ModeSelector).switchSelector(ModeSelectorLevelVacation).silent()
+					domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelNormal)
+				elseif (domoticz.devices(HeatingScenesSelector).level ~= HeatingScenesLevelVacation and domoticz.devices(ModeSelector).level == ModeSelectorLevelVacation) then
+					domoticz.log('Thermostaat staat niet op vakantie. Automatisering wel nog. Corrigeren', domoticz.LOG_DEBUG)
+					--Echter pakt dit script NIET de device change op die door het Toon-Timer script gedaan wordt.
+					domoticz.log('Thermostat notified Domoticz of disabled vacation mode. Changing automation to normal', domoticz.LOG_INFO)
+					domoticz.devices(ModeSelector).switchSelector(ModeSelectorLevelNormal)
+					domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelNormal)
+				end
+			else
+				domoticz.log('Initiation by device trigger. Changed '..device.name..' level:'..tostring(device.level)..' value: '..tostring(device.value), domoticz.LOG_DEBUG)
 			end
-		else
-			domoticz.log('Initiation by device trigger. Changed '..device.name..' level:'..tostring(device.level)..' value: '..tostring(device.value), domoticz.LOG_DEBUG)
-		end
 
-		if (device.name == ModeSelector) then
-			if (device.level == ModeSelectorLevelNormal) then
-				domoticz.log(Modeselector..' changed. Systeem status Normaal of iedereen is weer terug', domoticz.LOG_DEBUG)
-				-- Thermostaat op auto programma zetten
-				domoticz.log('Changing thermostat program to Auto.', domoticz.LOG_INFO)
-				domoticz.devices(HeatingSetpoint).cancelQueuedCommands()
-				domoticz.devices(HeatingAutoProgramSwitch).switchSelector(HeatingAutoProgramLevelAuto)
-				time = os.date("*t")
-				if (time.hour < 18) then
-						domoticz.log('Voor 18u. Dagelijkse apparaten aan.', domoticz.LOG_INFO)
-						local DayDevices = domoticz.devices().filter(DayTimeDevices)
-						DayDevices.forEach(function(DayDevice)
-							domoticz.log('Switching Daily device'..DayDevice.name..' on.', domoticz.LOG_DEBUG)
-							DayDevice.switchOn().CheckFirst()
-						end)
-				end
-			
-			elseif (device.level == ModeSelectorLevelManual) then
-			-- Systeem status handmatig
-				domoticz.log(Modeselector..' changed. Systeem staat op handmatig. Ik doe NIKS!', domoticz.LOG_DEBUG)
-			elseif (device.level == ModeSelectorLevelVacation and domoticz.devices(HeatingScenesSelector).level ~= HeatingScenesLevelVacation) then
-			-- Systeem status Vakantie
-				-- Automation met de hand op vakantie gezet. Dit kan niet. wordt terug gezet naar normaal.
-				domoticz.log('Domoticz set to vacation mode. This is not possible. Needs to be done through thermostat.', domoticz.LOG_ERROR)
-				domoticz.log('Domoticz switch '..device.name..' will be reverted to level '..tostring(device.lastlevel)..'.', domoticz.LOG_ERROR)
-				if (device.lastlevel == nil) then
-					device.switchSelector(ModeSelectorLevelNormal)
-				else
-					device.switchSelector(device.lastlevel).silent()
-				end
-			elseif (device.level == ModeSelectorLevelAway) then
-			domoticz.log(Modeselector..' changed. Iedereen is weg', domoticz.LOG_DEBUG)
-			-- Systeem status Weg
-				if (OperationSecondMode ~= ModeSelectorSecondLevelPresOverr and OperationSecondMode ~= ModeSelectorSecondLevelKidVacPresOver) then 
-					domoticz.log('Iedereen is zojuist vertrokken en geen override.', domoticz.LOG_DEBUG)
-					--Verwarming handmatig op twee graden lager zetten
-					local CurrentSetpoint = domoticz.devices(HeatingSetpoint).setpoint
-					local NewSetpoint     = CurrentSetpoint - 2
-					domoticz.log('Changing thermostat program to temporary and temp to '..NewSetpoint..' degrees.', domoticz.LOG_INFO)
-					--domoticz.devices(HeatingAutoProgramSelector).switchSelector(30)
-					domoticz.devices(HeatingSetpoint).updateSetPoint(NewSetpoint).afterMin(30)
-					
-					--Als normaal de radio aan staat, deze uit zetten
+			if (device.name == ModeSelector) then
+				if (device.level == ModeSelectorLevelNormal) then
+					domoticz.log(ModeSelector..' changed. Systeem status Normaal of iedereen is weer terug', domoticz.LOG_DEBUG)
+					-- Thermostaat op auto programma zetten
+					domoticz.log('Changing thermostat program to Auto.', domoticz.LOG_INFO)
+					domoticz.devices(HeatingSetpoint).cancelQueuedCommands()
+					domoticz.devices(HeatingAutoProgramSelector).switchSelector(HeatingAutoProgramLevelAuto)
 					time = os.date("*t")
 					if (time.hour < 18) then
-						domoticz.log('Voor 18u. Dagelijkse apparaten uit.', domoticz.LOG_INFO)
-						local DayDevices = domoticz.devices().filter(DayTimeDevices)
-						DayDevices.forEach(function(DayDevice)
-							domoticz.log('Switching Daily device'..DayDevice.name..' off.', domoticz.LOG_DEBUG)
-							DayDevice.switchOff().CheckFirst()
-						end)
-					end	
-				else
-					domoticz.log('Iedereen is zojuist vertrokken, maar override staat aan', domoticz.LOG_DEBUG)
+							domoticz.log('Voor 18u. Dagelijkse apparaten aan.', domoticz.LOG_INFO)
+							local DayDevices = domoticz.devices().filter(DayTimeDevices)
+							DayDevices.forEach(function(DayDevice)
+								domoticz.log('Switching Daily device'..DayDevice.name..' on.', domoticz.LOG_DEBUG)
+								DayDevice.switchOn().CheckFirst()
+							end)
+					end
+				
+				elseif (device.level == ModeSelectorLevelManual) then
+				-- Systeem status handmatig
+					domoticz.log(ModeSelector..' changed. Systeem staat op handmatig. Ik doe NIKS!', domoticz.LOG_DEBUG)
+				elseif (device.level == ModeSelectorLevelVacation and domoticz.devices(HeatingScenesSelector).level ~= HeatingScenesLevelVacation) then
+				-- Systeem status Vakantie
+					-- Automation met de hand op vakantie gezet. Dit kan niet. wordt terug gezet naar normaal.
+					domoticz.log('Domoticz set to vacation mode. This is not possible. Needs to be done through thermostat.', domoticz.LOG_ERROR)
+					domoticz.log('Domoticz switch '..device.name..' will be reverted to level '..tostring(device.lastlevel)..'.', domoticz.LOG_ERROR)
+					if (device.lastlevel == nil) then
+						device.switchSelector(ModeSelectorLevelNormal)
+					else
+						device.switchSelector(device.lastlevel).silent()
+					end
+				elseif (device.level == ModeSelectorLevelAway) then
+				domoticz.log(ModeSelector..' changed. Iedereen is weg', domoticz.LOG_DEBUG)
+				-- Systeem status Weg
+					if (OperationSecondMode ~= ModeSelectorSecondLevelPresOverr and OperationSecondMode ~= ModeSelectorSecondLevelKidVacPresOver) then 
+						domoticz.log('Iedereen is zojuist vertrokken en geen override.', domoticz.LOG_DEBUG)
+						--Verwarming handmatig op twee graden lager zetten
+						local CurrentSetpoint = domoticz.devices(HeatingSetpoint).setpoint
+						local NewSetpoint     = CurrentSetpoint - 2
+						domoticz.log('Changing thermostat program to temporary and temp to '..NewSetpoint..' degrees.', domoticz.LOG_INFO)
+						--domoticz.devices(HeatingAutoProgramSelector).switchSelector(30)
+						domoticz.devices(HeatingSetpoint).updateSetPoint(NewSetpoint).afterMin(30)
+						
+						--Als normaal de radio aan staat, deze uit zetten
+						time = os.date("*t")
+						if (time.hour < 18) then
+							domoticz.log('Voor 18u. Dagelijkse apparaten uit.', domoticz.LOG_INFO)
+							local DayDevices = domoticz.devices().filter(DayTimeDevices)
+							DayDevices.forEach(function(DayDevice)
+								domoticz.log('Switching Daily device'..DayDevice.name..' off.', domoticz.LOG_DEBUG)
+								DayDevice.switchOff().CheckFirst()
+							end)
+						end	
+					else
+						domoticz.log('Iedereen is zojuist vertrokken, maar override staat aan', domoticz.LOG_DEBUG)
+					end
+				end
+
+			elseif (device.name == HeatingScenesSelector) then
+				domoticz.log(HeatingScenesSelector..' changed.', domoticz.LOG_DEBUG)
+				if (device.level == HeatingScenesLevelVacation and domoticz.devices(ModeSelector).level ~= ModeSelectorLevelVacation) then
+					domoticz.log(HeatingScenesSelector..' changed. Vacationmode On and '..ModeSelector..' has no Vacationlevel set.', domoticz.LOG_DEBUG)
+				-- Systeem status Vakantie. Wordt opgelegd door Toon
+					domoticz.log('Thermostat notified Domoticz of vacation mode.', domoticz.LOG_INFO)
+					domoticz.devices(ModeSelector).switchSelector(ModeSelectorLevelVacation).silent()
+					domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelNormal)
+				elseif (device.level ~= HeatingScenesLevelVacation and domoticz.devices(ModeSelector).level == ModeSelectorLevelVacation) then
+					domoticz.log(HeatingScenesSelector..' changed. Vacationmode Off and '..ModeSelector..' has Vacationlevel set.', domoticz.LOG_DEBUG)
+				-- Systeem status WAS Vakantie. Wordt opgelegd door Toon
+					domoticz.log('Thermostat notified Domoticz of disabled vacation mode. Changing automation to normal', domoticz.LOG_INFO)
+					domoticz.devices(ModeSelector).switchSelector(ModeSelectorLevelNormal)
+					domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelNormal)
 				end
 			end
-
-		elseif (device.name == HeatingScenesSelector) then
-			domoticz.log(HeatingScenesSelector..' changed.', domoticz.LOG_DEBUG)
-			if (device.level == HeatingScenesLevelVacation and domoticz.devices(ModeSelector).level ~= ModeSelectorLevelVacation) then
-				domoticz.log(HeatingScenesSelector..' changed. Vacationmode On and '..ModeSelector..' has no Vacationlevel set.', domoticz.LOG_DEBUG)
-			-- Systeem status Vakantie. Wordt opgelegd door Toon
-				domoticz.log('Thermostat notified Domoticz of vacation mode.', domoticz.LOG_INFO)
-				domoticz.devices(ModeSelector).switchSelector(ModeSelectorLevelVacation).silent()
-				domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelNormal)
-			elseif (device.level ~= HeatingScenesLevelVacation and domoticz.devices(ModeSelector).level == ModeSelectorLevelVacation) then
-				domoticz.log(HeatingScenesSelector..' changed. Vacationmode Off and '..ModeSelector..' has Vacationlevel set.', domoticz.LOG_DEBUG)
-			-- Systeem status WAS Vakantie. Wordt opgelegd door Toon
-				domoticz.log('Thermostat notified Domoticz of disabled vacation mode. Changing automation to normal', domoticz.LOG_INFO)
-				domoticz.devices(ModeSelector).switchSelector(ModeSelectorLevelNormal)
-				domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelNormal)
-			end
-		end
 		domoticz.log('Reached the end of the script. Nothing more to do.', domoticz.LOG_DEBUG)
 	end
 }
