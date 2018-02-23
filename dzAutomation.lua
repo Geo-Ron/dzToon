@@ -10,7 +10,7 @@
 	
 ]]--
 
-local scriptVersion                 			= '2.2.53'
+local scriptVersion                 			= '2.2.54'
 
 
 -- Start User Defineable Variables
@@ -63,6 +63,12 @@ return {
 		
 		domoticz.log('Variable HeatingAutoProgramLevelAuto value '..HeatingAutoProgramLevelAuto, domoticz.LOG_DEBUG)
 
+        if (device.name ~= ModeSelector and domoticz.devices(ModeSelector).level == ModeSelectorLevelManual) then
+            domoticz.log('Initiation by device trigger. Changed '..device.name..' level:'..tostring(device.level)..' value: '..tostring(device.value) ..' state: '..tostring(device.state), domoticz.LOG_IFNO)
+            domoticz.log(ModeSelector..' changed. Systeem staat op handmatig. Ik doe NIKS!', domoticz.LOG_IFNFO)
+            return
+        end
+
 			if (device.isTimer) then	--Start Timer Actions
 				domoticz.log('Initiation by time trigger.', domoticz.LOG_DEBUG)
 				if (domoticz.devices(HeatingScenesSelector).level == HeatingScenesLevelVacation and domoticz.devices(ModeSelector).level ~= ModeSelectorLevelVacation) then
@@ -79,7 +85,7 @@ return {
 					domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelNormal)
 				end
 			else
-				domoticz.log('Initiation by device trigger. Changed '..device.name..' level:'..tostring(device.level)..' value: '..tostring(device.value), domoticz.LOG_DEBUG)
+				domoticz.log('Initiation by device trigger. Changed '..device.name..' level:'..tostring(device.level)..' value: '..tostring(device.value) ..' state: '..tostring(device.state), domoticz.LOG_DEBUG)
 			end
 
 			if (device.name == ModeSelector) then
