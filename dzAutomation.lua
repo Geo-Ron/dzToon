@@ -10,7 +10,7 @@
 	
 ]]--
 
-local scriptVersion                 			= '2.1.38'
+local scriptVersion                 			= '2.1.39'
 local ModeSelector      		       			= 'Automation'
 	local ModeSelectorLevelNormal				= 10
 	local ModeSelectorLevelManual				= 20
@@ -87,7 +87,7 @@ return {
 							domoticz.log('Voor 18u. Dagelijkse apparaten aan.', domoticz.LOG_INFO)
 							local DayDevices = domoticz.devices().filter(DayTimeDevices)
 							DayDevices.forEach(function(DayDevice)
-								domoticz.log('Switching Daily device'..DayDevice.name..' on.', domoticz.LOG_DEBUG)
+								domoticz.log('Switching Daily device '..DayDevice.name..' on.', domoticz.LOG_DEBUG)
 								DayDevice.switchOn().CheckFirst()
 							end)
 					end
@@ -123,7 +123,7 @@ return {
 							domoticz.log('Voor 18u. Dagelijkse apparaten uit.', domoticz.LOG_INFO)
 							local DayDevices = domoticz.devices().filter(DayTimeDevices)
 							DayDevices.forEach(function(DayDevice)
-								domoticz.log('Switching Daily device'..DayDevice.name..' off.', domoticz.LOG_DEBUG)
+								domoticz.log('Switching Daily device '..DayDevice.name..' off.', domoticz.LOG_DEBUG)
 								DayDevice.switchOff().CheckFirst()
 							end)
 						end	
