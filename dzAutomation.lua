@@ -10,7 +10,7 @@
 	
 ]]--
 
-local scriptVersion                 			= '2.3.15'
+local scriptVersion                 			= '2.3.20'
 
 
 -- Start User Defineable Variables
@@ -74,17 +74,25 @@ return {
 		if domoticz.time.matchesRule(PresenceOverrideTimeRule) then
 			domoticz.log('PresenceOverrideTimeRule is today. Changing ModeSelectorSecond level if needed', domoticz.LOG_DEBUG)
 			if (domoticz.devices(ModeSelectorSecond).level == ModeSelectorSecondLevelKidVac) then
-				domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelKidVacPresOver).checkFirst()
+			    if (domoticz.devices(ModeSelectorSecond).level ~= ModeSelectorSecondLevelKidVacPresOver) then
+				    domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelKidVacPresOver)
+				end
 			else
-				domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelPresOverr).checkFirst()
+				if (domoticz.devices(ModeSelectorSecond).level ~= ModeSelectorSecondLevelPresOverr) then
+				    domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelPresOverr)
+				end
 			end
 		-- if not on tuesday 
 		elseif (domoticz.devices(ModeSelectorSecond).level == ModeSelectorSecondLevelPresOverr) then
 			domoticz.log('PresenceOverrideTimeRule is NOT today. Changing ModeSelectorSecond level if needed', domoticz.LOG_DEBUG)
-			domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelNormal).checkFirst()
+			if (domoticz.devices(ModeSelectorSecond).level ~= ModeSelectorSecondLevelNormal) then
+			    domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelNormal)
+			end
 		elseif (domoticz.devices(ModeSelectorSecond).level == ModeSelectorSecondLevelKidVacPresOver) then
 			domoticz.log('PresenceOverrideTimeRule is NOT today and it was a childrens holiday. Changing ModeSelectorSecond level if needed', domoticz.LOG_DEBUG)
-			domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelKidVac).checkFirst()
+			if (domoticz.devices(ModeSelectorSecond).level ~= ModeSelectorSecondLevelKidVac) then
+			    domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelKidVac)
+			end
 		end	
 		
 
