@@ -11,14 +11,14 @@
 ]]--
 
 
- local scriptVersion = '1.2.28'
+ local scriptVersion = '1.2.29'
  local inspiredByUrl = 'https://www.domoticz.com/forum/viewtopic.php?f=14&t=1641'
  local inspiredByAuthor = 'pwhooftman'
  
 ---- Variables to match dummy switches withing Domoticz
- local GasMeterUserVariableName   = 'UV_GasMeter' -- User Variable type String that holds the local IP of Toon
+ local GasMeterUserVariableName   = 'UV_GasMeter' -- User Variable type Float that holds the current meter reading
  local GasPulseSensorName         = 'Gasmeter_Sensor' -- Actual Gas Pulse Sensor
- local GasMeterName         	  = 'Gasmeter' -- Dummy Gas Counter or Usage device 
+ local GasMeterName         	  = 'Gasmeter' -- Dummy Counter or Gas device 
  local UpdateType                 = 'Gas' -- Possible values: Gas or Counter type device
  local devicecorrectionfactor     = 1000
  
