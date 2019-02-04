@@ -7,18 +7,13 @@
 
 	CHANGE LOG: See https://github.com/Geo-Ron/dzVents/commits/master/dzToon.lua
 
-	THANKS AND CONFETTI FOR:
-	- MarcelR and many other	for getting a rooted toon			'https://www.domoticaforum.eu/viewtopic.php?f=87&t=11235'
-	- Maes			for the original script and documentation		'https://www.domoticz.com/forum/viewtopic.php?f=34&t=11421'
-	- DennisD		for the Burner Info addition					'https://www.domoticz.com/forum/viewtopic.php?f=34&t=11421&p=161078#p161078'
-	- Emacee		ideas for boiler Pressure						'https://www.domoticaforum.eu/viewtopic.php?f=87&t=11671&start=90'
-	- and the others I seems to keep forgetting
-	
 
 ]]--
 
 
- local scriptVersion = '2.3.10'
+ local scriptVersion = '2.3.13'
+ local originalVersionUrl = 'https://www.domoticz.com/forum/viewtopic.php?f=34&t=11421'
+ local originalAuthor = 'Maes'
  
 ---- Variables to match dummy switches withing Domoticz
  local ToonIPUserVariableName           = 'UV_ToonIP' -- User Variable type String that holds the local IP of Toon
@@ -77,10 +72,6 @@
 		        local NewToonSetPoint = domoticz.utils.round(item.setPoint, 2)
     		    domoticz.log('Try to set Toon setpoint to '.. NewToonSetPoint*100, domoticz.LOG_DEBUG)
     			domoticz.openURL('http://'.. ToonIP ..'/happ_thermstat?action=setSetpoint&Setpoint='..NewToonSetPoint*100)
-				    -- Optional Rework - need to test
-					--local handle = assert(io.popen(string.format('curl http://%s/happ_thermstat?action=setSetpoint&Setpoint=%s', ToonIP, NewToonSetPoint*100)))
-					--local BoilerInfo = handle:read('*all')
-					--handle:close()
     			domoticz.log('Updating Toon thermostat sensor (from Domoticz to Toon) to new set point: '.. NewToonSetPoint*100)
     		elseif item.name == ToonScenesSensorName then 
     		    domoticz.log('Updating Toon Scene setting based on  '.. item.name, domoticz.LOG_DEBUG)
@@ -173,6 +164,7 @@
                 if currentProgramState == 0 then currentProgramState = AutoProgramNoLevel -- No
                 elseif currentProgramState == 1 then currentProgramState = AutoProgramYesLevel -- Yes
                 elseif currentProgramState == 2 then currentProgramState = AutoProgramTempLevel -- Temporary
+                elseif currentProgramState == 4 then currentProgramState = 4 -- value from vacation
                 else domoticz.log('currentProgramState unknown: state is '.. currentProgramState, domoticz.LOG_ERROR)  
                 end      
             local currentActiveState = tonumber(jsonThermostatInfo.activeState)
@@ -204,9 +196,9 @@
             ----
             -- Start changing selectors if needed.
             -- Update the thermostat sensor to current setpoint
-            if domoticz.utils.round(domoticz.devices(ToonThermostatSensorName).setPoint, 2) ~= currentSetpoint then
+            if (domoticz.utils.round(domoticz.devices(ToonThermostatSensorName).setPoint, 2) ~= currentSetpoint and currentProgramState ~= 4) then
                 domoticz.log('Updating Domoticz thermostat sensor (from Toon to Domoticz) to new set point: ' ..currentSetpoint)
-                domoticz.devices(ToonThermostatSensorName).updateSetPoint(currentSetpoint).silent()
+                domoticz.devices(ToonThermostatSensorName).updateSetPoint(currentSetpoint).silent() --Silent is not working. Therefore the 'and currentProgramState to avoid issues setting Toon to vacation mode'
             end
             -- Update the temperature sensor to current room temperature
             if domoticz.utils.round(domoticz.devices(ToonTemperatureSensorName).temperature, 1) ~= currentTemperature then 
@@ -217,12 +209,12 @@
             -- Update the toon scene selector sensor to current program state
             if domoticz.devices(ToonScenesSensorName).level ~= currentActiveState then  -- Update toon selector if it has changed
                 domoticz.log('Updating Toon Scenes selector to: '..currentActiveState)
-                domoticz.devices(ToonScenesSensorName).switchSelector(currentActiveState).silent()
+                domoticz.devices(ToonScenesSensorName).switchSelector(currentActiveState) --.silent()
             end
             -- Updates the toon auto program switch 
-            if domoticz.devices(ToonAutoProgramSensorName).level ~= currentProgramState then -- Update toon auto program selector if it has changed
+            if (domoticz.devices(ToonAutoProgramSensorName).level ~= currentProgramState and currentProgramState ~= 4) then -- Update toon auto program selector if it has changed
                 domoticz.log('Updating Toon Auto Program selector to: '..currentProgramState)
-                domoticz.devices(ToonAutoProgramSensorName).switchSelector(currentProgramState).silent()
+                domoticz.devices(ToonAutoProgramSensorName).switchSelector(currentProgramState) --.silent()
             end
             -- Updates the toon program information text box
             if currentNextTime == 0 or currentNextSetPoint == 0 then
