@@ -11,7 +11,7 @@
 	
 ]] --
 
-local scriptVersion = "1.7.16"
+local scriptVersion = "1.8.01"
 
 local AroundMaximumMins = 15
 local ModeSelector = "Automation"
@@ -67,23 +67,25 @@ return {
         domoticz.log("someoneAround: " .. tostring(someoneAround), domoticz.LOG_DEBUG)
         domoticz.log("someonePresent: " .. tostring(someonePresent), domoticz.LOG_DEBUG)
 
-        if (someoneAround == true and someonePresent == false) then
-            domoticz.log("Changing automation status to: " .. ModeSelectorLevelAround, domoticz.LOG_DEBUG)
-            if (domoticz.devices(ModeSelectorSecond).level ~= ModeSelectorLevelAround) then
-                domoticz.log("Switchting automation to Away(Around)", domoticz.LOG_INFO)
-                domoticz.devices(ModeSelector).switchSelector(ModeSelectorLevelAround)
-            end
-        elseif (someoneAround == false and someonePresent == false) then
-            domoticz.log("Changing automation status to: " .. ModeSelectorLevelAway, domoticz.LOG_DEBUG)
-            if (domoticz.devices(ModeSelectorSecond).level ~= ModeSelectorLevelAway) then
-                domoticz.log("Switchting automation to Away", domoticz.LOG_INFO)
-                domoticz.devices(ModeSelector).switchSelector(ModeSelectorLevelAway)
-            end
-        elseif (someonePresent == true) then
-            domoticz.log("Changing automation status to: " .. ModeSelectorLevelNormal, domoticz.LOG_DEBUG)
-            if (domoticz.devices(ModeSelectorSecond).level ~= ModeSelectorLevelNormal) then
-                domoticz.log("Switchting automation to Normal", domoticz.LOG_INFO)
-                domoticz.devices(ModeSelector).switchSelector(ModeSelectorLevelNormal)
+        if (domoticz.devices(ModeSelectorSecond).level ~= ModeSelectorLevelManual) then
+            if (someoneAround == true and someonePresent == false) then
+                domoticz.log("Changing automation status to: " .. ModeSelectorLevelAround, domoticz.LOG_DEBUG)
+                if (domoticz.devices(ModeSelector).level ~= ModeSelectorLevelAround) then
+                    domoticz.log("Switchting automation to Away(Around)", domoticz.LOG_INFO)
+                    domoticz.devices(ModeSelector).switchSelector(ModeSelectorLevelAround)
+                end
+            elseif (someoneAround == false and someonePresent == false) then
+                domoticz.log("Changing automation status to: " .. ModeSelectorLevelAway, domoticz.LOG_DEBUG)
+                if (domoticz.devices(ModeSelector).level ~= ModeSelectorLevelAway) then
+                    domoticz.log("Switchting automation to Away", domoticz.LOG_INFO)
+                    domoticz.devices(ModeSelector).switchSelector(ModeSelectorLevelAway)
+                end
+            elseif (someonePresent == true) then
+                domoticz.log("Changing automation status to: " .. ModeSelectorLevelNormal, domoticz.LOG_DEBUG)
+                if (domoticz.devices(ModeSelector).level ~= ModeSelectorLevelNormal) then
+                    domoticz.log("Switchting automation to Normal", domoticz.LOG_INFO)
+                    domoticz.devices(ModeSelector).switchSelector(ModeSelectorLevelNormal)
+                end
             end
         end
     end
