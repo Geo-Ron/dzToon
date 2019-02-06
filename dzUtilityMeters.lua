@@ -10,7 +10,7 @@
 
 ]] --
 
-local scriptVersion = "1.4.08"
+local scriptVersion = "1.4.09"
 local inspiredByUrl = "https://www.domoticz.com/forum/viewtopic.php?f=14&t=1641"
 local inspiredByAuthor = "pwhooftman"
 
@@ -75,7 +75,7 @@ return {
 
 			if item.name == WaterPulseSensorName and item.state == "Open" then
 				--local NewToonSetPoint = domoticz.utils.round(item.setPoint, 2)
-				local NewWaterMeterValue = CurrentWaterMeterValue + 0.0001
+				local NewWaterMeterValue = CurrentWaterMeterValue + 0.0005
 				domoticz.log("Updating Watermeter to " .. NewWaterMeterValue, domoticz.LOG_DEBUG)
 				--Update Variable in m3
 				if WaterUpdateType == "Waterflow" then
