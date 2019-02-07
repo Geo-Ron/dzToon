@@ -11,7 +11,7 @@
 ]]--
 
 
- local scriptVersion = '2.3.13'
+ local scriptVersion = '2.3.15'
  local originalVersionUrl = 'https://www.domoticz.com/forum/viewtopic.php?f=34&t=11421'
  local originalAuthor = 'Maes'
  
@@ -214,7 +214,7 @@
             -- Updates the toon auto program switch 
             if (domoticz.devices(ToonAutoProgramSensorName).level ~= currentProgramState and currentProgramState ~= 4) then -- Update toon auto program selector if it has changed
                 domoticz.log('Updating Toon Auto Program selector to: '..currentProgramState)
-                domoticz.devices(ToonAutoProgramSensorName).switchSelector(currentProgramState) --.silent()
+                domoticz.devices(ToonAutoProgramSensorName).switchSelector(currentProgramState).silent()
             end
             -- Updates the toon program information text box
             if currentNextTime == 0 or currentNextSetPoint == 0 then
@@ -233,7 +233,7 @@
             if ToonBurnerName ~= '' then
                 if domoticz.devices(ToonBurnerName).level ~= currentBurnerInfo then 
                     domoticz.log('Updating Toon burner info to new level '..currentBurnerInfo)
-                    domoticz.devices(ToonBurnerName).switchSelector(currentBurnerInfo).silent()
+                    domoticz.devices(ToonBurnerName).switchSelector(currentBurnerInfo) --.silent()
                 end
             end
             -- Update ModulationInfo
