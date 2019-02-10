@@ -10,7 +10,7 @@
 	
 ]] --
 
-local scriptVersion = "1.1.11"
+local scriptVersion = "1.2.01"
 
 -- Start User Defineable Variables
 local ToonBurnerName = "Toon BranderInfo" -- (Optional) Dummy Selector Device (it shows the current burner state)
