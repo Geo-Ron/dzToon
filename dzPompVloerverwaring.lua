@@ -49,9 +49,15 @@ return {
                 domoticz.devices(PumpDeviceName).switchOff().afterSec(40)
             end
         elseif (item.isTimer) then
-            if (domoticz.devices(PumpDeviceName).lastUpdate.minutesAgo > 60) then
-                domoticz.log("Rotating the pump to prevent it from getting stuck.", domoticz.LOG_INFO)
-                domoticz.devices(PumpDeviceName).switchOn().forSec(30).checkFirst()
+            if (domoticz.devices(PumpDeviceName).lastUpdate.hoursAgo > 23) then
+                domoticz.log("Rotating the pump for ~5 minutes to prevent it from getting stuck or rust.", domoticz.LOG_INFO)
+                --domoticz.devices(PumpDeviceName).switchOn().forSec(30).checkFirst()
+                domoticz.devices(PumpDeviceName).switchOn()
+                domoticz.devices(PumpDeviceName).switchOn().afterSec(30)
+                domoticz.devices(PumpDeviceName).switchOn().afterMin(1)
+                domoticz.devices(PumpDeviceName).switchOff().afterMin(6)
+                domoticz.devices(PumpDeviceName).switchOff().afterMin(7)
+                domoticz.devices(PumpDeviceName).switchOff().afterMin(8)
             end
         end
     end
