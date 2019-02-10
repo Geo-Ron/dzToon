@@ -282,6 +282,7 @@ return {
             if ToonBurnerName ~= "" then
                 if domoticz.devices(ToonBurnerName).level ~= currentBurnerInfo then
                     domoticz.log("Updating Toon burner info to new level " .. currentBurnerInfo)
+                    -- Not silent, because of Pump script
                     domoticz.devices(ToonBurnerName).switchSelector(currentBurnerInfo) --.silent()
                 end
             end
