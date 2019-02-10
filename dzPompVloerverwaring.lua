@@ -10,7 +10,7 @@
 	
 ]] --
 
-local scriptVersion = "1.0.01"
+local scriptVersion = "1.1.11"
 
 -- Start User Defineable Variables
 local ToonBurnerName = "Toon BranderInfo" -- (Optional) Dummy Selector Device (it shows the current burner state)
@@ -22,7 +22,7 @@ local PumpDeviceName = "Pomp_vloerverwarming" --Switch device that controls the 
 return {
     logging = {
         --level = domoticz.LOG_DEBUG, -- Uncomment to override the dzVents global logging setting
-        marker = "dzPompVloerverwarmin_v" .. scriptVersion
+        marker = "dzPompVloerverwarming_v" .. scriptVersion
     },
     on = {
         timer = {
@@ -36,16 +36,23 @@ return {
         if (item.isDevice) then
             -- Run Only if a device has changed on the Domoticz side...
             domoticz.log("Device " .. item.name .. " changed. Will change pump state accordingly", domoticz.LOG_DEBUG)
+
             if item.level == ToonBurnerCVLevel or item.level == ToonBurnerPreHeatLevel then
                 domoticz.log("Toon informed the heating is burning.", domoticz.LOG_debug)
-                domoticz.devices(PumpDeviceName).switchOn().checkFirst()
+                domoticz.devices(PumpDeviceName).switchOn()
+                domoticz.devices(PumpDeviceName).switchOn().afterSec(20)
+                domoticz.devices(PumpDeviceName).switchOn().afterSec(40)
             else
                 domoticz.log("Toon informed the heating is burning.", domoticz.LOG_debug)
-                domoticz.devices(PumpDeviceName).switchOff().checkFirst()
+                domoticz.devices(PumpDeviceName).switchOff()
+                domoticz.devices(PumpDeviceName).switchOff().afterSec(20)
+                domoticz.devices(PumpDeviceName).switchOff().afterSec(40)
             end
         elseif (item.isTimer) then
-            domoticz.log("Rotating the pump to prevent it from getting stuck.", domoticz.LOG_debug)
-            domoticz.devices(PumpDeviceName).switchOn().forSec(2).checkFirst()
+            if (domoticz.devices(PumpDeviceName).lastUpdate.minutesAgo > 60) then
+                domoticz.log("Rotating the pump to prevent it from getting stuck.", domoticz.LOG_INFO)
+                domoticz.devices(PumpDeviceName).switchOn().forSec(30).checkFirst()
+            end
         end
     end
 }
