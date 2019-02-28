@@ -10,7 +10,7 @@
 	
 ]] --
 
-local scriptVersion = "2.4.31"
+local scriptVersion = "2.4.39"
 
 -- Start User Defineable Variables
 local ModeSelector = "Automation"
@@ -71,9 +71,9 @@ return {
                         " level:" ..
                             tostring(device.level) ..
                                 " value: " .. tostring(device.value) .. " state: " .. tostring(device.state) .." lastLevel: " .. tostring(device.lastlevel),
-                domoticz.LOG_IFNO
+                domoticz.LOG_INFO
             )
-            domoticz.log(ModeSelector .. " changed. Systeem staat op handmatig. Ik doe NIKS!", domoticz.LOG_IFNFO)
+            domoticz.log(ModeSelector .. " changed. Systeem staat op handmatig. Ik doe NIKS!", domoticz.LOG_INFO)
             return
         end
 
