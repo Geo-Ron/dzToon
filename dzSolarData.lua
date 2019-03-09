@@ -20,8 +20,8 @@ Virtual Lux sensor and other real-time solar data
 ]]--
 
 -- Variables to customize ------------------------------------------------
-local city = 'HAMONT'					-- City for Wunderground API (You can also use a pws here like 'pws:ISTOCKHO854')
-local countryCode = 'BE'							-- Country code for Wunderground API
+local city = 'HAMONT'					-- Only for log purpose
+local countryCode = 'BE'							-- Only for log purpose
 local idxSolarAzimuth = 116						-- (Integer) Virtual Azimuth Device ID
 local idxSolarAltitude = 117					-- (Integer) Your virtual Solar Altitude Device I
 -- local wuAPIkey = '92ebf28146f4d93d'		-- Weather Underground API Key
@@ -33,18 +33,17 @@ local fetchIntervalDayMins = 15 -- Day time scraping interval. Never set this be
 local fetchIntervalNightMins = 30 -- Night time scraping interval. 
 
 -- Optional Domoticz devices
--- Optional Domoticz devices
 local idxLux = 115 -- (Integer) Domoticz virtual Lux device ID
 local idxCloudCover = 118 -- (Integer) Domoticz Cloud Cover (PERCENTAGE TYPE) sensor device ID
+--local idxPressure = nil -- (Integer) Device ID of your Pressure Device if you have one. Not striclty needed since the script take the Dark Sky value by default
 
--- (You don't have to configure these if you accept the values returned by the weather observation station)
-local latitude = nil	-- Latitude. (Decimal number) Decimal Degrees. E.g. something like 51.748485
-local longitude = nil	-- Longitude. (Decimal number) Decimal Degrees. E.g.something like 5.629728.
-local altitude = nil	-- Altitude. (Integer) Meters above sea level.
+
+local latitude = 51.247907	-- Latitude. (Decimal number) Decimal Degrees. E.g. something like 51.748485
+local longitude = 5.543212	-- Longitude. (Decimal number) Decimal Degrees. E.g.something like 5.629728. 51.247907, 5.543212
+local altitude = 40	-- Altitude. (Integer) Meters above sea level.
 
 
 -- Please don't make any changes below this line (Except for setting logging level)
-
 local scriptName = 'solarData'
 local scriptVersion = '2.4.1-DarkSky'
 
