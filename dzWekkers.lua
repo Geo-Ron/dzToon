@@ -52,6 +52,7 @@ return {
         domoticz.log('Weekdag: '..weekdag,domoticz.LOG_DEBUG)
         domoticz.log('Weekend: '..tostring(weekend),domoticz.LOG_DEBUG)
         domoticz.log('Lampjes State: '..domoticz.groups(SwitchGroup).state,domoticz.LOG_DEBUG)
+        
         -- domoticz.log('Lampjes State: '..domoticz.groups(SwitchGroup).dump(),domoticz.LOG_DEBUG)
         if (domoticz.time.matchesRule('at 6:45') and OperationMode == 'Normaal' and not Uitslapen) then
             --normale operatie, geen weekend

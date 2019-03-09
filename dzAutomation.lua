@@ -228,20 +228,25 @@ return {
                         OperationSecondMode ~= ModeSelectorSecondLevelKidVacPresOver)
                  then
                     domoticz.log("Iemand is in de buurt en geen override.", domoticz.LOG_DEBUG)
-                    --Verwarming handmatig op twee graden lager zetten
+                    --Verwarming aanpassen afhankelijk van de vorige situatie
+
+                    --Huidige Toon temperatuur instelling ophalen.
                     local CurrentSetpoint = domoticz.devices(HeatingSetpoint).setPoint
                     domoticz.log(
                         "Fetched setpoint from " .. HeatingSetpoint .. " with value: " .. CurrentSetpoint .. " degrees.",
                         domoticz.LOG_DEBUG
                     )
+                    --Huidige buitentemp ophalen
                     local OutsideTemp = domoticz.devices(WU_Device).temperature
                     domoticz.log(
                         "Fetched outside Temp from " ..
                             WU_Device .. " with value: " .. tostring(OutsideTemp) .. " degrees.",
                         domoticz.LOG_DEBUG
                     )
+                    --Huidige Toon Scene ophalen
                     local CurrentSceneLevel = domoticz.devices(HeatingScenesSelector).level
 
+                    --Als Huidige Toon scene 'Weg' is, dan kan het auto programma weer gestart worden
                     if (CurrentSceneLevel == ModeSelectorLevelAway) then
                         --domoticz.devices(HeatingSetpoint).updateSetPoint(NewSetpoint) --.afterMin(30) --.afterMin on setpoint device currently is not supported
                         domoticz.log(

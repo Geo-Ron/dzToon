@@ -82,6 +82,7 @@ return {
                     domoticz.log("Toon Scene change to off.", domoticz.LOG_INFO)
                     domoticz.openURL("http://" .. ToonIP .. "/happ_thermstat?action=setSetpoint&Setpoint=69")
                 elseif item.level == ScenesManualLevel then
+                    --Moet nog ingezet worden
                     domoticz.log("Toon Scene change to manual.", domoticz.LOG_INFO)
                 elseif item.level == ScenesComfortLevel then
                     domoticz.log("Toon Scene change to Comfort.", domoticz.LOG_INFO)
