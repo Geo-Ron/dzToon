@@ -10,7 +10,7 @@
 	
 ]] --
 
-local scriptVersion = "1.2.01"
+local scriptVersion = "1.2.03"
 
 -- Start User Defineable Variables
 local ToonBurnerName = "Toon BranderInfo" -- (Optional) Dummy Selector Device (it shows the current burner state)
@@ -39,22 +39,22 @@ return {
 
             if item.level == ToonBurnerCVLevel or item.level == ToonBurnerPreHeatLevel then
                 domoticz.log("Toon informed the heating is burning.", domoticz.LOG_debug)
+                domoticz.devices(PumpDeviceName).cancelQueuedCommands()
                 domoticz.devices(PumpDeviceName).switchOn()
                 domoticz.devices(PumpDeviceName).switchOn().afterSec(20) --Switch does not always honour the RFXCom command
                 domoticz.devices(PumpDeviceName).switchOn().afterSec(40) --Switch does not always honour the RFXCom command
             else
                 domoticz.log("Toon informed the heating is burning.", domoticz.LOG_debug)
+                domoticz.devices(PumpDeviceName).cancelQueuedCommands()
                 domoticz.devices(PumpDeviceName).switchOff()
                 domoticz.devices(PumpDeviceName).switchOff().afterSec(20) --Switch does not always honour the RFXCom command
                 domoticz.devices(PumpDeviceName).switchOff().afterSec(40) --Switch does not always honour the RFXCom command
             end
         elseif (item.isTimer) then
             if (domoticz.devices(PumpDeviceName).lastUpdate.hoursAgo > 23) then
-                domoticz.log(
-                    "Rotating the pump for ~5 minutes to prevent it from getting stuck or rust.",
-                    domoticz.LOG_INFO
-                )
+                domoticz.log("Rotating the pump for ~5 minutes to prevent it from getting stuck or rust.",domoticz.LOG_INFO)
                 --domoticz.devices(PumpDeviceName).switchOn().forSec(30).checkFirst()
+                domoticz.devices(PumpDeviceName).cancelQueuedCommands()
                 domoticz.devices(PumpDeviceName).switchOn()
                 domoticz.devices(PumpDeviceName).switchOn().afterSec(30) --Switch does not always honour the RFXCom command
                 domoticz.devices(PumpDeviceName).switchOn().afterMin(1) --Switch does not always honour the RFXCom command
