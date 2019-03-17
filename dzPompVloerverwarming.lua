@@ -10,7 +10,7 @@
 	
 ]] --
 
-local scriptVersion = "1.3.11"
+local scriptVersion = "1.3.12"
 
 -- Start User Defineable Variables
 local ToonBurnerName = nil -- (Optional) Dummy Selector Device (it shows the current burner state)
@@ -52,9 +52,9 @@ return {
                 if domoticz.devices(PumpDeviceName).state == 'On' then
                     domoticz.log("Toon informed the heating is burning.", domoticz.LOG_INFO)
                     domoticz.devices(PumpDeviceName).cancelQueuedCommands()
-                    domoticz.devices(PumpDeviceName).switchOff()
-                    domoticz.devices(PumpDeviceName).switchOff().afterMin(15) --Switch does not always honour the RFXCom command
+                    domoticz.devices(PumpDeviceName).switchOff().afterMin(15)
                     domoticz.devices(PumpDeviceName).switchOff().afterMin(16) --Switch does not always honour the RFXCom command
+                    domoticz.devices(PumpDeviceName).switchOff().afterMin(17) --Switch does not always honour the RFXCom command
                 end
             end
         elseif (item.isTimer) then
