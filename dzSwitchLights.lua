@@ -46,6 +46,7 @@ return {
                 
                 --Wake up time is coming
                 else
+                    --SwitchOn random delay within 30 mins
                     domoticz.groups(SwitchGroup).switchOn().withinMin(30)
                     domoticz.groups(SwitchGroup).switchOn().afterMin(31) --double check to be sure
                     domoticz.groups(SwitchGroup).switchOn().afterMin(32) --double check to be sure
