@@ -10,7 +10,7 @@
 
 ]] --
 
-local scriptVersion = "2.3.17"
+local scriptVersion = "2.3.18"
 local originalVersionUrl = "https://www.domoticz.com/forum/viewtopic.php?f=34&t=11421"
 local originalAuthor = "Maes"
 
@@ -82,7 +82,6 @@ return {
                     domoticz.log("Toon Scene change to off.", domoticz.LOG_INFO)
                     domoticz.openURL("http://" .. ToonIP .. "/happ_thermstat?action=setSetpoint&Setpoint=69")
                 elseif item.level == ScenesManualLevel then
-                    --Moet nog ingezet worden
                     domoticz.log("Toon Scene change to manual.", domoticz.LOG_INFO)
                 elseif item.level == ScenesComfortLevel then
                     domoticz.log("Toon Scene change to Comfort.", domoticz.LOG_INFO)
@@ -283,15 +282,14 @@ return {
             if ToonBurnerName ~= "" then
                 if domoticz.devices(ToonBurnerName).level ~= currentBurnerInfo then
                     domoticz.log("Updating Toon burner info to new level " .. currentBurnerInfo)
-                    -- Not silent, because of Pump script
-                    domoticz.devices(ToonBurnerName).switchSelector(currentBurnerInfo) --.silent()
+                    domoticz.devices(ToonBurnerName).switchSelector(currentBurnerInfo).silent()
                 end
             end
             -- Update ModulationInfo
             if ToonModulationName ~= "" then
                 if domoticz.devices(ToonModulationName).percentage ~= currentModulation then
                     domoticz.log("Updating modulation info to new value: " .. currentModulation .. "%")
-                    domoticz.devices(ToonModulationName).updatePercentage(currentModulation).silent()
+                    domoticz.devices(ToonModulationName).updatePercentage(currentModulation) --.silent()
                 end
             end
             -- Update the boilerInTemp
