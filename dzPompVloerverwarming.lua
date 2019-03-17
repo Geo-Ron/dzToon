@@ -10,7 +10,7 @@
 	
 ]] --
 
-local scriptVersion = "1.3.12"
+local scriptVersion = "1.3.13"
 
 -- Start User Defineable Variables
 local ToonBurnerName = nil -- (Optional) Dummy Selector Device (it shows the current burner state)
@@ -27,7 +27,7 @@ return {
     },
     on = {
         timer = {
-            "Every hour"
+            "every other hour at daytime"
         },
         devices = {
             --ToonBurnerName
