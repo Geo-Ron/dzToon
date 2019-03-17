@@ -10,7 +10,7 @@
 	
 ]] --
 
-local scriptVersion = "1.3.01"
+local scriptVersion = "1.3.11"
 
 -- Start User Defineable Variables
 local ToonBurnerName = nil -- (Optional) Dummy Selector Device (it shows the current burner state)
@@ -41,17 +41,21 @@ return {
 
             --if item.level == ToonBurnerCVLevel or item.level == ToonBurnerPreHeatLevel then
             if item.percentage > 0 then
-                domoticz.log("Toon informed the heating is burning.", domoticz.LOG_debug)
-                domoticz.devices(PumpDeviceName).cancelQueuedCommands()
-                domoticz.devices(PumpDeviceName).switchOn()
-                domoticz.devices(PumpDeviceName).switchOn().afterSec(20) --Switch does not always honour the RFXCom command
-                domoticz.devices(PumpDeviceName).switchOn().afterSec(40) --Switch does not always honour the RFXCom command
+                domoticz.log("Toon informed the heating is burning.", domoticz.LOG_INFO)
+                if domoticz.devices(PumpDeviceName).state == 'Off' then
+                    domoticz.devices(PumpDeviceName).cancelQueuedCommands()
+                    domoticz.devices(PumpDeviceName).switchOn()
+                    domoticz.devices(PumpDeviceName).switchOn().afterSec(20) --Switch does not always honour the RFXCom command
+                    domoticz.devices(PumpDeviceName).switchOn().afterSec(40) --Switch does not always honour the RFXCom command
+                end
             else
-                domoticz.log("Toon informed the heating is burning.", domoticz.LOG_debug)
-                domoticz.devices(PumpDeviceName).cancelQueuedCommands()
-                domoticz.devices(PumpDeviceName).switchOff()
-                domoticz.devices(PumpDeviceName).switchOff().afterMin(15) --Switch does not always honour the RFXCom command
-                domoticz.devices(PumpDeviceName).switchOff().afterMin(16) --Switch does not always honour the RFXCom command
+                if domoticz.devices(PumpDeviceName).state == 'On' then
+                    domoticz.log("Toon informed the heating is burning.", domoticz.LOG_INFO)
+                    domoticz.devices(PumpDeviceName).cancelQueuedCommands()
+                    domoticz.devices(PumpDeviceName).switchOff()
+                    domoticz.devices(PumpDeviceName).switchOff().afterMin(15) --Switch does not always honour the RFXCom command
+                    domoticz.devices(PumpDeviceName).switchOff().afterMin(16) --Switch does not always honour the RFXCom command
+                end
             end
         elseif (item.isTimer) then
             if (domoticz.devices(PumpDeviceName).lastUpdate.hoursAgo > 23) then
