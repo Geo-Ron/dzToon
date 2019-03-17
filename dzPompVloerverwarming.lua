@@ -10,12 +10,13 @@
 	
 ]] --
 
-local scriptVersion = "1.2.03"
+local scriptVersion = "1.3.01"
 
 -- Start User Defineable Variables
-local ToonBurnerName = "Toon BranderInfo" -- (Optional) Dummy Selector Device (it shows the current burner state)
+local ToonBurnerName = nil -- (Optional) Dummy Selector Device (it shows the current burner state)
 local ToonBurnerCVLevel = 10 --Level of selector defined in ToonBurnerName for status Burner state Central Heating
 local ToonBurnerPreHeatLevel = 30 --Level of selector defined in ToonBurnerName for status Burner state heating to reach start level of program
+local ToonModulatieDevice = "Toon Modulatie"
 local PumpDeviceName = "Pomp_vloerverwarming" --Switch device that controls the pump
 -- End User Defineable Variable
 
@@ -29,7 +30,8 @@ return {
             "Every hour"
         },
         devices = {
-            ToonBurnerName
+            --ToonBurnerName
+            ToonModulatieDevice
         }
     },
     execute = function(domoticz, item)
@@ -37,7 +39,8 @@ return {
             -- Run Only if a device has changed on the Domoticz side...
             domoticz.log("Device " .. item.name .. " changed. Will change pump state accordingly", domoticz.LOG_DEBUG)
 
-            if item.level == ToonBurnerCVLevel or item.level == ToonBurnerPreHeatLevel then
+            --if item.level == ToonBurnerCVLevel or item.level == ToonBurnerPreHeatLevel then
+            if item.percentage > 0 then
                 domoticz.log("Toon informed the heating is burning.", domoticz.LOG_debug)
                 domoticz.devices(PumpDeviceName).cancelQueuedCommands()
                 domoticz.devices(PumpDeviceName).switchOn()
@@ -47,8 +50,8 @@ return {
                 domoticz.log("Toon informed the heating is burning.", domoticz.LOG_debug)
                 domoticz.devices(PumpDeviceName).cancelQueuedCommands()
                 domoticz.devices(PumpDeviceName).switchOff()
-                domoticz.devices(PumpDeviceName).switchOff().afterSec(20) --Switch does not always honour the RFXCom command
-                domoticz.devices(PumpDeviceName).switchOff().afterSec(40) --Switch does not always honour the RFXCom command
+                domoticz.devices(PumpDeviceName).switchOff().afterMin(15) --Switch does not always honour the RFXCom command
+                domoticz.devices(PumpDeviceName).switchOff().afterMin(16) --Switch does not always honour the RFXCom command
             end
         elseif (item.isTimer) then
             if (domoticz.devices(PumpDeviceName).lastUpdate.hoursAgo > 23) then
