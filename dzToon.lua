@@ -10,7 +10,7 @@
 
 ]] --
 
-local scriptVersion = "2.3.18"
+local scriptVersion = "2.3.19"
 local originalVersionUrl = "https://www.domoticz.com/forum/viewtopic.php?f=34&t=11421"
 local originalAuthor = "Maes"
 
@@ -168,7 +168,11 @@ return {
             ---
 
             -- Parsing Fetched Data
-            local currentboilerInTemp = tonumber(jsonBoilerInfo.boilerInTemp)
+            if jsonBoilerInfo.boilerInTemp ~= nil then
+                local currentboilerInTemp = tonumber(jsonBoilerInfo.boilerInTemp)
+            else 
+                local currentboilerInTemp = 0
+            end
             local currentboilerOutTemp = tonumber(jsonBoilerInfo.boilerOutTemp)
             local currentboilerPressure = domoticz.utils.round(tonumber(jsonBoilerInfo.boilerPressure), 1)
             local currentModulation = tonumber(jsonThermostatInfo.currentModulationLevel)
