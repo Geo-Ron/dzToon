@@ -1,4 +1,4 @@
- #! /bin/sh
+#!/usr/bin/env bash
 ### BEGIN INFO
 # Description:       This script will find a device by its mac address and update the UV accordingly
 ### END INFO
