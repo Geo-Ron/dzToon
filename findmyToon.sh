@@ -23,8 +23,11 @@ printf "Scanning subnet $SUBNET...\n"
 nmap $SUBNET -sn -sC 
 
 sleep 20
+
+/usr/sbin/arp -n
+
 #fetch arp table and insert IP into variable
-toonIP=$(arp -n | grep ${toonMAC} | awk '{print $1}')
+toonIP=$(/usr/sbin/arp -n | grep ${toonMAC} | awk '{print $1}')
 
 printf "For MAC $toonMAC I've found the ip $toonIP\n"
 printf "Setting variable using curl http://192.168.0.90:10080/json.htm?type=command&param=updateuservariable&vname=${UVToonIP}&vtype=2&vvalue=${toonIP}`n`"
