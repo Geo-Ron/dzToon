@@ -10,7 +10,7 @@
 
 ]] --
 
-local scriptVersion = "2.3.19"
+local scriptVersion = "2.3.20"
 local originalVersionUrl = "https://www.domoticz.com/forum/viewtopic.php?f=34&t=11421"
 local originalAuthor = "Maes"
 
@@ -168,7 +168,7 @@ return {
             ---
 
             -- Parsing Fetched Data
-            if jsonBoilerInfo.boilerInTemp ~= nil then
+            if jsonBoilerInfo.boilerInTemp ~= nil and jsonBoilerInfo.boilerInTemp ~= "null" then
                 local currentboilerInTemp = tonumber(jsonBoilerInfo.boilerInTemp)
             else 
                 local currentboilerInTemp = 0
@@ -229,7 +229,7 @@ return {
             local currentBoiletSetPoint = jsonThermostatInfo.currentInternalBoilerSetpoint
             ----
             ---- Printing Debug information
-            domoticz.log("Fetched currentboilerInTemp value     " .. currentboilerInTemp, domoticz.LOG_DEBUG)
+            domoticz.log("Fetched currentboilerInTemp value     " .. tostring(currentboilerInTemp), domoticz.LOG_DEBUG)
             domoticz.log("Fetched currentboilerOutTemp value    " .. currentboilerOutTemp, domoticz.LOG_DEBUG)
             domoticz.log("Fetched currentboilerPressure value   " .. currentboilerPressure, domoticz.LOG_DEBUG)
             domoticz.log("Fetched currentBurnerInfo value       " .. currentBurnerInfo, domoticz.LOG_DEBUG)
