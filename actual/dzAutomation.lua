@@ -10,7 +10,7 @@
 	
 ]] --
 
-local scriptVersion = "2.4.40"
+local scriptVersion = "2.5.18"
 
 -- Start User Defineable Variables
 local ModeSelector = "Automation"
@@ -41,12 +41,12 @@ local DayTimeDevices = {
     "Radio Keuken"
 } -- Devices that are on during the day
 local WU_Device = "WU_THB"
-local PresenceOverrideTimeRule = "on tue" --The days timer the presence detection override should be activated.
+local PresenceOverrideTimeRule = "on tue" --The days timer the presence detection override should be activated. only days
 -- End User Defineable Variable
 
 return {
     logging = {
-        level = domoticz.LOG_DEBUG, -- Uncomment to override the dzVents global logging setting
+        --level = domoticz.LOG_DEBUG, -- Uncomment to override the dzVents global logging setting
         marker = "dzAutomation_v" .. scriptVersion
     },
     on = {
@@ -79,8 +79,11 @@ return {
 
         ----------------------------------------------------------
         -- On tuesdays the presence override needs to be activated
-        if domoticz.time.matchesRule(PresenceOverrideTimeRule) then
-            -- if not on tuesday
+        -- this is when my parents-in-law are baysitting the house and kids, so they will no be left alone in the cold...
+
+        -- times added to disable script overriding my manual overrides
+        if domoticz.time.matchesRule("at 03:00-23:00 " .. PresenceOverrideTimeRule) then
+            -- if on tuesday
             domoticz.log(
                 "PresenceOverrideTimeRule is today. Changing ModeSelectorSecond level if needed",
                 domoticz.LOG_DEBUG
@@ -94,7 +97,7 @@ return {
                     domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelPresOverr)
                 end
             end
-        elseif (domoticz.devices(ModeSelectorSecond).level == ModeSelectorSecondLevelPresOverr) then
+        elseif (domoticz.devices(ModeSelectorSecond).level == ModeSelectorSecondLevelPresOverr and domoticz.time.matchesRule("at 23:00-23:59 " .. PresenceOverrideTimeRule)) then
             domoticz.log(
                 "PresenceOverrideTimeRule is NOT today. Changing ModeSelectorSecond level if needed",
                 domoticz.LOG_DEBUG
@@ -102,7 +105,7 @@ return {
             if (domoticz.devices(ModeSelectorSecond).level ~= ModeSelectorSecondLevelNormal) then
                 domoticz.devices(ModeSelectorSecond).switchSelector(ModeSelectorSecondLevelNormal)
             end
-        elseif (domoticz.devices(ModeSelectorSecond).level == ModeSelectorSecondLevelKidVacPresOver) then
+        elseif (domoticz.devices(ModeSelectorSecond).level == ModeSelectorSecondLevelKidVacPresOverv and domoticz.time.matchesRule("at 23:00-23:59 " .. PresenceOverrideTimeRule)) then
             domoticz.log(
                 "PresenceOverrideTimeRule is NOT today and it was a childrens holiday. Changing ModeSelectorSecond level if needed",
                 domoticz.LOG_DEBUG
@@ -159,6 +162,7 @@ return {
                 -- Thermostaat op auto programma zetten
                 domoticz.log("Changing thermostat program to Auto.", domoticz.LOG_INFO)
                 domoticz.devices(HeatingSetpoint).cancelQueuedCommands()
+                domoticz.devices(HeatingAutoProgramSelector).switchSelector(HeatingAutoProgramLevelOff) --to compensate for errors
                 domoticz.devices(HeatingAutoProgramSelector).switchSelector(HeatingAutoProgramLevelAuto)
 
                 if domoticz.time.matchesRule(DayTimeDevicesTimeRange) then
@@ -199,7 +203,8 @@ return {
                 -- Systeem status Weg
                 if
                     (OperationSecondMode ~= ModeSelectorSecondLevelPresOverr and
-                        OperationSecondMode ~= ModeSelectorSecondLevelKidVacPresOver)
+                        OperationSecondMode ~= ModeSelectorSecondLevelKidVacPresOver and
+                        domoticz.devices(ModeSelector).level ~= ModeSelectorLevelManual)
                  then
                     domoticz.log("Iedereen is zojuist vertrokken en geen override.", domoticz.LOG_DEBUG)
                     domoticz.devices(HeatingScenesSelector).switchSelector(HeatingScenesLevelAway)
@@ -221,63 +226,64 @@ return {
                 else
                     domoticz.log("Iedereen is zojuist vertrokken, maar override staat aan", domoticz.LOG_DEBUG)
                 end
-            elseif (device.level == ModeSelectorLevelAround) then
-                domoticz.log(ModeSelector .. " changed. Iedereen is weg, maar wel in de buurt", domoticz.LOG_DEBUG)
-                -- Systeem status Weg(Dichtbij)
-                if
-                    (OperationSecondMode ~= ModeSelectorSecondLevelPresOverr and
-                        OperationSecondMode ~= ModeSelectorSecondLevelKidVacPresOver)
-                 then
-                    domoticz.log("Iemand is in de buurt en geen override.", domoticz.LOG_DEBUG)
-                    --Verwarming handmatig op twee graden lager zetten
-                    local CurrentSetpoint = domoticz.devices(HeatingSetpoint).setPoint
-                    domoticz.log(
-                        "Fetched setpoint from " .. HeatingSetpoint .. " with value: " .. CurrentSetpoint .. " degrees.",
-                        domoticz.LOG_DEBUG
-                    )
-                    -- local OutsideTemp = domoticz.devices(WU_Device).temperature
-                    -- domoticz.log(
-                    --     "Fetched outside Temp from " ..
-                    --         WU_Device .. " with value: " .. tostring(OutsideTemp) .. " degrees.",
-                    --     domoticz.LOG_DEBUG
-                    -- )
+            -- elseif (device.level == ModeSelectorLevelAround) then
+            --     domoticz.log(ModeSelector .. " changed. Iedereen is weg, maar wel in de buurt", domoticz.LOG_DEBUG)
+            --     -- Systeem status Weg(Dichtbij)
+            --     if
+            --         (OperationSecondMode ~= ModeSelectorSecondLevelPresOverr and
+            --             OperationSecondMode ~= ModeSelectorSecondLevelKidVacPresOver)
+            --      then
+            --         domoticz.log("Iemand is in de buurt en geen override.", domoticz.LOG_DEBUG)
+            --         --Verwarming handmatig op twee graden lager zetten
+            --         local CurrentSetpoint = domoticz.devices(HeatingSetpoint).setPoint
+            --         domoticz.log(
+            --             "Fetched setpoint from " .. HeatingSetpoint .. " with value: " .. CurrentSetpoint .. " degrees.",
+            --             domoticz.LOG_DEBUG
+            --         )
+            --         -- local OutsideTemp = domoticz.devices(WU_Device).temperature
+            --         -- domoticz.log(
+            --         --     "Fetched outside Temp from " ..
+            --         --         WU_Device .. " with value: " .. tostring(OutsideTemp) .. " degrees.",
+            --         --     domoticz.LOG_DEBUG
+            --         -- )
                     
-                    local toonSceneLevel = domoticz.devices(HeatingScenesSelector).level
+            --         local toonSceneLevel = domoticz.devices(HeatingScenesSelector).level
 
 
-                    if (toonSceneLevel == HeatingScenesLevelAway) then
-                        --domoticz.devices(HeatingSetpoint).updateSetPoint(NewSetpoint) --.afterMin(30) --.afterMin on setpoint device currently is not supported
-                        domoticz.log(
-                            "Someone is entering the neighborhood. Detected using HeatingScenes. Starting auto program",
-                            domoticz.LOG_DEBUG
-                        )
-                        domoticz.devices(HeatingAutoProgramSelector).switchSelector(HeatingAutoProgramLevelAuto)
-                    else
-                        local NewSetpoint = CurrentSetpoint - HeatingSetpointAround
-                        domoticz.log(
-                            "Someone is leaving the premises. Changing temperature to " ..
-                                tostring(NewSetpoint) .. " degrees",
-                            domoticz.LOG_DEBUG
-                        )
-                        domoticz.devices(HeatingSetpoint).updateSetPoint(NewSetpoint)
-                    end
-                    --Als normaal de radio aan staat, deze uit zetten
-                    if domoticz.time.matchesRule(DayTimeDevicesTimeRange) then
-                        domoticz.log("Time matches DayTimeDevicesTimeRange", domoticz.LOG_DEBUG)
-                        local DayDevices = domoticz.devices().filter(DayTimeDevices)
-                        DayDevices.forEach(
-                            function(DayDevice)
-                                domoticz.log(
-                                    "Switching Daytime device " .. DayDevice.name .. " off.",
-                                    domoticz.LOG_DEBUG
-                                )
-                                DayDevice.switchOff().checkFirst()
-                            end
-                        )
-                    end
-                else
-                    domoticz.log("Iedereen is zojuist vertrokken, maar override staat aan", domoticz.LOG_DEBUG)
-                end
+            --         if (toonSceneLevel == HeatingScenesLevelAway) then
+            --             --domoticz.devices(HeatingSetpoint).updateSetPoint(NewSetpoint) --.afterMin(30) --.afterMin on setpoint device currently is not supported
+            --             domoticz.log(
+            --                 "Someone is entering the neighborhood. Detected using HeatingScenes. Starting auto program",
+            --                 domoticz.LOG_DEBUG
+            --             )
+            --             domoticz.devices(HeatingAutoProgramSelector).switchSelector(HeatingAutoProgramLevelOff) --to compensate for errors
+            --             domoticz.devices(HeatingAutoProgramSelector).switchSelector(HeatingAutoProgramLevelAuto) --Not always working standalone
+            --         else
+            --             local NewSetpoint = CurrentSetpoint - HeatingSetpointAround
+            --             domoticz.log(
+            --                 "Someone is leaving the premises. Changing temperature to " ..
+            --                     tostring(NewSetpoint) .. " degrees",
+            --                 domoticz.LOG_DEBUG
+            --             )
+            --             domoticz.devices(HeatingSetpoint).updateSetPoint(NewSetpoint)
+            --         end
+            --         --Als normaal de radio aan staat, deze uit zetten
+            --         if domoticz.time.matchesRule(DayTimeDevicesTimeRange) then
+            --             domoticz.log("Time matches DayTimeDevicesTimeRange", domoticz.LOG_DEBUG)
+            --             local DayDevices = domoticz.devices().filter(DayTimeDevices)
+            --             DayDevices.forEach(
+            --                 function(DayDevice)
+            --                     domoticz.log(
+            --                         "Switching Daytime device " .. DayDevice.name .. " off.",
+            --                         domoticz.LOG_DEBUG
+            --                     )
+            --                     DayDevice.switchOff().checkFirst()
+            --                 end
+            --             )
+            --         end
+            --     else
+            --         domoticz.log("Iedereen is zojuist vertrokken, maar override staat aan", domoticz.LOG_DEBUG)
+            --     end
             end
         elseif (device.name == HeatingScenesSelector) then
             domoticz.log(HeatingScenesSelector .. " changed.", domoticz.LOG_DEBUG)

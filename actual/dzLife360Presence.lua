@@ -11,7 +11,7 @@
 	
 ]] --
 
-local scriptVersion = "1.8.01"
+local scriptVersion = "1.9.01"
 
 local AroundMaximumMins = 15
 local ModeSelector = "Automation"
@@ -20,6 +20,11 @@ local ModeSelectorLevelManual = 20
 local ModeSelectorLevelVacation = 30
 local ModeSelectorLevelAway = 40
 local ModeSelectorLevelAround = 50
+local ModeSelectorSecond = "Automation Secundary"
+local ModeSelectorSecondLevelNormal = 10
+-- local ModeSelectorSecondLevelKidVac = 20 --Children are at home because of school holiday
+local ModeSelectorSecondLevelPresOverr = 30 --Presence Detection Override
+local ModeSelectorSecondLevelKidVacPresOver = 40 --Children school holiday ànd Presence detection Override
 
 return {
     active = true,
@@ -67,7 +72,8 @@ return {
         domoticz.log("someoneAround: " .. tostring(someoneAround), domoticz.LOG_DEBUG)
         domoticz.log("someonePresent: " .. tostring(someonePresent), domoticz.LOG_DEBUG)
 
-        if (domoticz.devices(ModeSelectorSecond).level ~= ModeSelectorLevelManual) then
+        -- ignore if manual or presence override active
+        if (domoticz.devices(ModeSelectorSecond).level ~= ModeSelectorLevelManual and domoticz.devices(ModeSelectorSecond).level ~= ModeSelectorSecondLevelKidVacPresOver domoticz.devices(ModeSelectorSecond).level ~= ModeSelectorSecondLevelPresOverr ) then
             if (someoneAround == true and someonePresent == false) then
                 domoticz.log("Changing automation status to: " .. ModeSelectorLevelAround, domoticz.LOG_DEBUG)
                 if (domoticz.devices(ModeSelector).level ~= ModeSelectorLevelAround) then
