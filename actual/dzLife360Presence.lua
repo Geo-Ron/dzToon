@@ -11,7 +11,7 @@
 	
 ]] --
 
-local scriptVersion = "1.9.03"
+local scriptVersion = "1.9.04"
 
 local AroundMaximumMins = 15
 local ModeSelector = "Automation"
@@ -95,6 +95,8 @@ return {
                     domoticz.devices(ModeSelector).switchSelector(ModeSelectorLevelNormal)
                 end
             end
+        else 
+            domoticz.log("Override or manual active. No action perfmormed. ", domoticz.LOG_DEBUG)
         end
     end
 }
