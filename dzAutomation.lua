@@ -235,12 +235,21 @@ return {
                         "Fetched setpoint from " .. HeatingSetpoint .. " with value: " .. CurrentSetpoint .. " degrees.",
                         domoticz.LOG_DEBUG
                     )
+<<<<<<< HEAD
                     -- local OutsideTemp = domoticz.devices(WU_Device).temperature
                     -- domoticz.log(
                     --     "Fetched outside Temp from " ..
                     --         WU_Device .. " with value: " .. tostring(OutsideTemp) .. " degrees.",
                     --     domoticz.LOG_DEBUG
                     -- )
+=======
+                    local OutsideTemp = domoticz.devices(WU_Device).temperature
+                    domoticz.log(
+                        "Fetched outside Temp from " ..
+                            WU_Device .. " with value: " .. tostring(OutsideTemp) .. " degrees.",
+                        domoticz.LOG_DEBUG
+                    )
+>>>>>>> 517e050796e60eb3596b5638c46f2bb05b6e6079
                     
                     local toonSceneLevel = domoticz.devices(HeatingScenesSelector).level
 
