@@ -52,9 +52,9 @@ return {
                 domoticz.log("Toon informed the heating is not burning anymore.", domoticz.LOG_INFO)
                 if domoticz.devices(PumpDeviceName).state == 'On' then
                     domoticz.devices(PumpDeviceName).cancelQueuedCommands()
-                    domoticz.devices(PumpDeviceName).switchOff().afterMin(15)
-                    domoticz.devices(PumpDeviceName).switchOff().afterMin(16) --Switch does not always honour the RFXCom command
-                    domoticz.devices(PumpDeviceName).switchOff().afterMin(17) --Switch does not always honour the RFXCom command
+                    domoticz.devices(PumpDeviceName).switchOff().afterMin(30)
+                    domoticz.devices(PumpDeviceName).switchOff().afterMin(31) --Switch does not always honour the RFXCom command
+                    domoticz.devices(PumpDeviceName).switchOff().afterMin(32) --Switch does not always honour the RFXCom command
                 end
             end
         elseif (item.isTimer) then
